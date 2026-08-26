@@ -1,0 +1,9 @@
+.DS_Store
+
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example
+
+# Local logs
+*.log
