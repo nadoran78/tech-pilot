@@ -4,7 +4,7 @@ Tech Pilot은 새롭게 등장하는 AI 기술을 지속적으로 파악하고, 
 
 ## Current Status
 
-현재는 **2단계: 기술 스택 선정**을 진행하고 있다. 뉴스 수집 MVP의 기술 스택 기준은 승인됐으며, 기능 개발은 별도 Issue에서 시작한다.
+현재는 **2단계: 기술 스택 선정**을 진행하고 있다. 뉴스 수집 MVP의 기술 스택 기준은 승인됐으며, Issue #7에서 3단계 구현을 위한 Python 프로젝트 골격을 초기화한다. 뉴스 수집 기능은 아직 구현하지 않는다.
 
 - 프로젝트의 배경과 목표: [제품 비전](docs/product/vision.md)
 - 전체 개발 단계: [제품 로드맵](docs/product/roadmap.md)
@@ -17,4 +17,17 @@ Tech Pilot은 새롭게 등장하는 AI 기술을 지속적으로 파악하고, 
 
 Issue, 브랜치와 PR 작업은 [개발 워크플로](docs/process/development-workflow.md)를 따른다.
 
-아직 설치하거나 실행할 애플리케이션 코드는 없다. 실행 방법은 2단계에서 기술 스택을 확정하고 프로젝트를 초기화한 뒤 추가한다.
+## Local Development
+
+Python 3.13과 [uv](https://docs.astral.sh/uv/)가 필요하다. 의존성을 설치한 뒤 다음 명령으로 기본 검증을 실행한다.
+
+```bash
+uv sync
+uv run tech-pilot --help
+uv run ruff format --check
+uv run ruff check
+uv run mypy src
+uv run pytest
+```
+
+`data/`와 `.env` 파일은 로컬 전용이며 Git에 포함하지 않는다.

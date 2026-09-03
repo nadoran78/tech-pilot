@@ -4,11 +4,11 @@
 - **Applies to:** Phase 2
 - **Purpose:** 3단계 뉴스 수집 MVP를 위한 최소 기술 기반, 근거와 보류 결정을 한 곳에서 관리한다.
 - **Read when:** 기술 스택을 검토·승인하거나 3단계 구현을 시작하기 전
-- **Related documents:** [2단계 문서](../phases/02-tech-stack-selection.md), [결정 기록](../decisions/0001-news-collection-mvp-tech-stack.md), [3단계 문서](../phases/03-news-collection.md)
+- **Related documents:** [2단계 문서](../phases/02-tech-stack-selection.md), [기술 스택 결정](../decisions/0001-news-collection-mvp-tech-stack.md), [Python 3.13 초기화 결정](../decisions/0002-python-3-13-bootstrap-runtime.md), [3단계 문서](../phases/03-news-collection.md)
 
 ## Decision State
 
-사용자가 2026-09-03에 이 기준을 승인했다. 여기의 선택과 [결정 기록](../decisions/0001-news-collection-mvp-tech-stack.md)은 `Accepted` 상태다. 정확한 Python 마이너 버전과 자동 실행 환경은 의도적으로 이후 초기화·수집 설계 Issue에서 결정한다.
+사용자가 2026-09-03에 이 기준을 승인했다. 여기의 선택과 [기술 스택 결정](../decisions/0001-news-collection-mvp-tech-stack.md)은 `Accepted` 상태다. 초기화 작업의 Python 3.13 세부 선택은 [결정 기록 0002](../decisions/0002-python-3-13-bootstrap-runtime.md)에서 검토 중이며, 자동 실행 환경은 의도적으로 이후 수집 설계 Issue에서 결정한다.
 
 ## Working Assumptions
 
@@ -22,7 +22,7 @@
 
 | 결정 영역 | 선택 | 이유 | 지금 하지 않는 것 |
 |---|---|---|---|
-| 언어·런타임 | CPython 3.13 이상 | 수집·파싱·분석 생태계가 풍부하고, 표준 라이브러리의 `sqlite3`, `argparse`, `logging`으로 초기 의존성을 낮출 수 있다. | 세부 마이너 버전 고정은 프로젝트 초기화 때 `uv`로 기록한다. |
+| 언어·런타임 | CPython 3.13 이상 | 수집·파싱·분석 생태계가 풍부하고, 표준 라이브러리의 `sqlite3`, `argparse`, `logging`으로 초기 의존성을 낮출 수 있다. | 초기화 PR에서는 3.13 계열을 제안하며, 최종 상태는 [결정 기록 0002](../decisions/0002-python-3-13-bootstrap-runtime.md)에서 관리한다. |
 | 프로젝트·의존성 관리 | `uv`와 `pyproject.toml`·lockfile | Python 버전, 환경, 의존성, lockfile을 한 도구로 관리할 수 있다. | 패키지 배포나 workspace 구성 |
 | 첫 실행 형태 | `argparse` 기반 CLI | 수집을 재현·테스트하기 쉽고 API나 웹 UI 없이도 수동 실행과 스케줄러 연결이 가능하다. | HTTP API, 웹 애플리케이션, 대시보드 |
 | 저장 방식 | 표준 라이브러리 `sqlite3`와 명시적 SQL migration | 별도 서버 없이 디스크 기반 저장을 시작할 수 있고, 이후 더 큰 DB로 옮길 경로가 있다. | ORM, 외부 DB, 벡터 DB |
@@ -44,7 +44,7 @@
 
 ## Initial Project Shape
 
-다음 구조는 3단계에서 프로젝트를 초기화할 때의 기준이며, 이 Issue에서는 만들지 않는다.
+다음 구조는 Issue #7의 초기화 기준이다. 각 하위 패키지에는 3단계 구현 전까지 동작을 추가하지 않는다.
 
 ```text
 src/tech_pilot/
@@ -56,7 +56,7 @@ tests/
 data/                 # Git 제외
 ```
 
-초기 검증 명령의 제안은 `uv run ruff format --check`, `uv run ruff check`, `uv run mypy src`, `uv run pytest`다. 실제 명령은 초기화 Issue에서 도구 설정과 함께 확인한다.
+초기 검증 명령은 `uv run ruff format --check`, `uv run ruff check`, `uv run mypy src`, `uv run pytest`다. 실제 실행 결과는 Issue #7의 PR에서 확인한다.
 
 ## Risks to Validate Before Phase 3
 
