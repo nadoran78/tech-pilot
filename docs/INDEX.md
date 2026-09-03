@@ -37,7 +37,7 @@
 
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
-| [뉴스 수집 MVP 기술 스택](architecture/tech-stack.md) | Draft | 어떤 최소 기술 기반을 제안하며, 무엇을 사용자 결정으로 남기는가? |
+| [뉴스 수집 MVP 기술 스택](architecture/tech-stack.md) | Accepted | 뉴스 수집 MVP의 최소 기술 기반과 의도적으로 보류한 항목은 무엇인가? |
 
 ## Phases
 

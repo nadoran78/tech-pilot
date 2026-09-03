@@ -1,14 +1,14 @@
 # News Collection MVP Tech Stack
 
-- **Status:** Draft
+- **Status:** Accepted
 - **Applies to:** Phase 2
-- **Purpose:** 3단계 뉴스 수집 MVP를 위한 최소 기술 기반의 제안, 근거와 보류 결정을 한 곳에서 관리한다.
+- **Purpose:** 3단계 뉴스 수집 MVP를 위한 최소 기술 기반, 근거와 보류 결정을 한 곳에서 관리한다.
 - **Read when:** 기술 스택을 검토·승인하거나 3단계 구현을 시작하기 전
 - **Related documents:** [2단계 문서](../phases/02-tech-stack-selection.md), [결정 기록](../decisions/0001-news-collection-mvp-tech-stack.md), [3단계 문서](../phases/03-news-collection.md)
 
 ## Decision State
 
-이 문서는 사용자 승인 전의 제안이다. 여기의 권장안과 [결정 기록](../decisions/0001-news-collection-mvp-tech-stack.md)은 `Proposed` 상태이며, 기술 스택이나 코드의 확정 근거가 아니다.
+사용자가 2026-09-03에 이 기준을 승인했다. 여기의 선택과 [결정 기록](../decisions/0001-news-collection-mvp-tech-stack.md)은 `Accepted` 상태다. 정확한 Python 마이너 버전과 자동 실행 환경은 의도적으로 이후 초기화·수집 설계 Issue에서 결정한다.
 
 ## Working Assumptions
 
@@ -16,11 +16,11 @@
 - 초기 수집량은 작고, 실시간 처리·다중 사용자·공개 API는 필요하지 않다.
 - 출처는 RSS·Atom과 공식 API를 우선하고, HTML 접근은 출처별 정책을 검토한 뒤 제한적으로 추가한다.
 - 수집 데이터와 비밀 값은 Git에 기록하지 않으며, 첫 자동 실행 환경은 로컬 개발 환경을 기준으로 한다.
-- 이 가정 중 하나라도 달라지면 확정 전에 권장안을 다시 평가한다.
+- 이 가정 중 하나라도 달라지면 영향과 함께 새 결정 기록에서 기준을 다시 평가한다.
 
-## Proposed Baseline
+## Accepted Baseline
 
-| 결정 영역 | 제안 | 이유 | 지금 하지 않는 것 |
+| 결정 영역 | 선택 | 이유 | 지금 하지 않는 것 |
 |---|---|---|---|
 | 언어·런타임 | CPython 3.13 이상 | 수집·파싱·분석 생태계가 풍부하고, 표준 라이브러리의 `sqlite3`, `argparse`, `logging`으로 초기 의존성을 낮출 수 있다. | 세부 마이너 버전 고정은 프로젝트 초기화 때 `uv`로 기록한다. |
 | 프로젝트·의존성 관리 | `uv`와 `pyproject.toml`·lockfile | Python 버전, 환경, 의존성, lockfile을 한 도구로 관리할 수 있다. | 패키지 배포나 workspace 구성 |
@@ -44,7 +44,7 @@
 
 ## Initial Project Shape
 
-다음 구조는 3단계에서 프로젝트를 초기화할 때의 제안이며, 이 Issue에서는 만들지 않는다.
+다음 구조는 3단계에서 프로젝트를 초기화할 때의 기준이며, 이 Issue에서는 만들지 않는다.
 
 ```text
 src/tech_pilot/
