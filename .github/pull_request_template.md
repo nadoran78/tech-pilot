@@ -9,7 +9,7 @@ Closes #
 ## Target Branch
 
 - Base: <!-- `develop` for normal work | `main` for release or hotfix -->
-- Head: <!-- feature|fix|docs|chore/<issue>-<slug> -->
+- Head: <!-- Normal: feature|fix|docs|chore/<issue>-<slug> | Hotfix: hotfix/<issue>-<slug> | Release: develop -->
 
 ## Why
 
