@@ -31,6 +31,7 @@
 
 - 제품 목표나 범위 변경: [제품 비전](docs/product/vision.md), [제품 로드맵](docs/product/roadmap.md)
 - 문서 추가·분리·이동: [문서 harness](docs/process/documentation-harness.md)
+- Issue, 브랜치, PR 또는 병합 작업: [개발 워크플로](docs/process/development-workflow.md)
 - 기술 스택 검토: [2단계 문서](docs/phases/02-tech-stack-selection.md), [결정 기록 안내](docs/decisions/README.md)
 - 뉴스 수집 설계: [3단계 문서](docs/phases/03-news-collection.md). 단, 3단계가 활성화된 이후에만 상세 설계를 확정한다.
 
@@ -44,6 +45,15 @@
 - 비밀 값과 개인정보를 코드, 문서, 로그, fixture에 기록하지 않는다.
 - 외부 서비스 게시, 배포 또는 외부 시스템 변경은 사용자의 명시적인 요청 없이 수행하지 않는다.
 - 변경 후 작업 유형에 맞는 검증을 수행하고 결과를 보고한다.
+
+## Git Workflow
+
+- `main`은 배포 가능한 릴리스 브랜치이고 `develop`은 일상 개발의 통합 및 기본 브랜치다.
+- 일반 작업은 최신 `develop`에서 Issue 번호가 포함된 단기 브랜치를 생성해 진행한다.
+- 일반 PR은 `develop`만 대상으로 하며, `main` 대상 PR은 release 또는 hotfix로 제한한다.
+- `main`과 `develop`에 직접 push하거나 PR을 자동 병합하지 않는다.
+- Issue와 Draft PR의 외부 발행은 사용자의 명시적인 요청이 있을 때만 수행한다.
+- 상세 분기, 병합과 예외 규칙은 [개발 워크플로](docs/process/development-workflow.md)를 따른다.
 
 ## Handoff Rules
 

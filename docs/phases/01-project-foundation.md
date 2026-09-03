@@ -20,6 +20,8 @@
 - 사람을 위한 `README.md`와 전체 문서 인덱스 구성
 - 문서 분리, 상태, 연결과 갱신 규칙 정의
 - 중요한 결정을 남길 위치와 형식 정의
+- Issue, 브랜치와 PR의 기본 개발 워크플로 정의
+- 반복 가능한 Issue·Draft PR 생성을 위한 저장소 전용 Codex Skill 구성
 - 현재 단계와 단계 전환 원칙 명시
 
 ## Non-Goals
@@ -38,8 +40,10 @@
 - [제품 비전](../product/vision.md)
 - [제품 로드맵](../product/roadmap.md)
 - [문서 harness](../process/documentation-harness.md)
+- [개발 워크플로](../process/development-workflow.md)
 - [결정 기록 안내](../decisions/README.md)
 - 1~3단계 범위 문서
+- GitHub Issue·PR 템플릿과 저장소 전용 Codex Skill
 
 ## Exit Criteria
 
@@ -47,6 +51,8 @@
 - 모든 현재 문서가 인덱스 또는 연결된 문서에서 도달 가능하다.
 - 제품 비전, 로드맵과 현재 단계가 서로 충돌하지 않는다.
 - 같은 규칙이나 결정이 여러 문서에서 독립적으로 정의되지 않는다.
+- `main`, `develop`과 단기 브랜치의 역할 및 병합 대상이 명확하다.
+- Issue와 Draft PR Skill이 사용자 승인 전 외부 상태를 변경하지 않는다.
 - 기술 스택과 뉴스 수집의 미결정 사항이 확정된 사실처럼 기록되지 않는다.
 - 저장소 내부의 문서 링크가 모두 유효하다.
 - 사용자가 문서 골격을 검토하고 2단계 전환 여부를 결정한다.
