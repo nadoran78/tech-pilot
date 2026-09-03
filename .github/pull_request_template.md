@@ -8,7 +8,7 @@ Closes #
 
 ## Target Branch
 
-- Base: `develop`
+- Base: <!-- `develop` for normal work | `main` for release or hotfix -->
 - Head: <!-- feature|fix|docs|chore/<issue>-<slug> -->
 
 ## Why
