@@ -1,6 +1,6 @@
 # Phase 2: Tech Stack Selection
 
-- **Status:** Draft
+- **Status:** Active
 - **Applies to:** Phase 2
 - **Purpose:** 뉴스 수집 MVP에 적합한 기술 스택을 비교하고 근거와 함께 확정한다.
 - **Read when:** 1단계가 완료되어 기술 선택을 준비하거나 검토할 때

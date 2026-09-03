@@ -4,11 +4,11 @@ Tech Pilot은 새롭게 등장하는 AI 기술을 지속적으로 파악하고, 
 
 ## Current Status
 
-현재는 **1단계: 프로젝트 문서 골격 구성**을 진행하고 있다. 기술 스택 선정과 기능 개발은 아직 시작하지 않았다.
+현재는 **2단계: 기술 스택 선정**을 진행하고 있다. 뉴스 수집 MVP의 기술 선택을 비교·제안하며, 사용자 승인 전에는 기능 개발을 시작하지 않는다.
 
 - 프로젝트의 배경과 목표: [제품 비전](docs/product/vision.md)
 - 전체 개발 단계: [제품 로드맵](docs/product/roadmap.md)
-- 현재 단계의 범위: [1단계 문서](docs/phases/01-project-foundation.md)
+- 현재 단계의 범위: [2단계 문서](docs/phases/02-tech-stack-selection.md)
 - 전체 문서 지도: [문서 인덱스](docs/INDEX.md)
 
 ## For Contributors and Codex
