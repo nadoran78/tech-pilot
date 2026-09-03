@@ -67,4 +67,6 @@ docs/decisions/0001-short-decision-title.md
 
 ## Index
 
-아직 생성된 결정 기록이 없다. 새 기록을 추가하면 이 목록과 [문서 인덱스](../INDEX.md)를 함께 갱신한다.
+| 문서 | 상태 | 답하는 질문 |
+|---|---|---|
+| [0001: 뉴스 수집 MVP 기술 스택](0001-news-collection-mvp-tech-stack.md) | Accepted | MVP의 기술 기반과 의도적으로 보류한 항목은 무엇인가? |

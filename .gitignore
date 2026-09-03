@@ -7,3 +7,6 @@
 
 # Local logs
 *.log
+
+# Local collection data
+data/

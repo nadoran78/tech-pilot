@@ -1,6 +1,6 @@
 # Phase 1: Project Foundation Documents
 
-- **Status:** Active
+- **Status:** Accepted
 - **Applies to:** Phase 1
 - **Purpose:** 프로젝트의 문서 골격과 Codex 작업 경로를 확립한다.
 - **Read when:** 현재 단계의 작업 범위나 완료 여부를 판단할 때
@@ -59,4 +59,4 @@
 
 ## Transition
 
-완료 조건을 확인한 뒤에도 자동으로 다음 단계로 전환하지 않는다. 사용자 승인 후 [2단계: 기술 스택 선정](02-tech-stack-selection.md)을 `Active`로 바꾸고 현재 단계가 표시된 문서를 함께 갱신한다.
+사용자가 2단계 전환을 승인했고, [2단계: 기술 스택 선정](02-tech-stack-selection.md)이 현재 활성 단계다.

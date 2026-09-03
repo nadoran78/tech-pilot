@@ -8,12 +8,12 @@
 
 ## Current Phase
 
-현재 활성 단계는 **1단계: 프로젝트 문서 골격 구성**이다.
+현재 활성 단계는 **2단계: 기술 스택 선정**이다.
 
 현재 작업에서는 다음 순서로 읽는다.
 
 1. [AGENTS.md](../AGENTS.md)
-2. [1단계: 프로젝트 문서 골격 구성](phases/01-project-foundation.md)
+2. [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md)
 3. 작업과 직접 관련된 문서
 
 단계 전환은 완료 조건을 검토한 뒤 사용자가 명시적으로 결정한다.
@@ -33,12 +33,18 @@
 | [개발 워크플로](process/development-workflow.md) | Active | Issue, 브랜치, PR과 릴리스를 어떤 흐름으로 관리하는가? |
 | [결정 기록 안내](decisions/README.md) | Active | 중요한 선택과 근거를 어떻게 남기는가? |
 
+## Architecture
+
+| 문서 | 상태 | 답하는 질문 |
+|---|---|---|
+| [뉴스 수집 MVP 기술 스택](architecture/tech-stack.md) | Accepted | 뉴스 수집 MVP의 최소 기술 기반과 의도적으로 보류한 항목은 무엇인가? |
+
 ## Phases
 
 | 단계 문서 | 상태 | 핵심 산출물 |
 |---|---|---|
-| [1단계: 프로젝트 문서 골격 구성](phases/01-project-foundation.md) | Active | 문서 구조와 Codex 작업 경로 |
-| [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md) | Draft | 기술 스택 결정과 근거 |
+| [1단계: 프로젝트 문서 골격 구성](phases/01-project-foundation.md) | Accepted | 문서 구조와 Codex 작업 경로 |
+| [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md) | Active | 기술 스택 결정과 근거 |
 | [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md) | Draft | 신뢰 가능한 뉴스 수집 기반 |
 
 4단계 이후의 상세 단계 문서는 해당 단계가 가까워졌을 때 만든다. 전체 방향은 [제품 로드맵](product/roadmap.md)에서 관리한다.
@@ -47,7 +53,6 @@
 
 다음 문서는 필요 시점 전에는 만들지 않는다.
 
-- `docs/architecture/tech-stack.md`: 2단계에서 기술 스택을 확정할 때
 - `docs/decisions/NNNN-*.md`: 중요한 결정을 확정할 때
 - `docs/architecture/news-collection.md`: 3단계에서 수집 구조를 설계할 때
 - `docs/specs/news-item.md`: 3단계에서 뉴스 데이터 계약을 정의할 때
