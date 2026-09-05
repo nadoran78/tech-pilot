@@ -8,7 +8,7 @@
 
 ## Decision State
 
-사용자가 2026-09-03에 이 기준을 승인했다. 여기의 선택과 [기술 스택 결정](../decisions/0001-news-collection-mvp-tech-stack.md)은 `Accepted` 상태다. 초기화 작업의 Python 3.13 세부 선택은 [결정 기록 0002](../decisions/0002-python-3-13-bootstrap-runtime.md)에서 검토 중이며, 자동 실행 환경은 의도적으로 이후 수집 설계 Issue에서 결정한다.
+사용자가 2026-09-03에 이 기준을 승인했고, 초기화 작업의 Python 3.13 세부 선택도 2026-09-05에 승인했다. [기술 스택 결정](../decisions/0001-news-collection-mvp-tech-stack.md)과 [결정 기록 0002](../decisions/0002-python-3-13-bootstrap-runtime.md)는 모두 `Accepted` 상태다. 자동 실행 환경은 의도적으로 이후 수집 설계 Issue에서 결정한다.
 
 ## Working Assumptions
 
@@ -22,7 +22,7 @@
 
 | 결정 영역 | 선택 | 이유 | 지금 하지 않는 것 |
 |---|---|---|---|
-| 언어·런타임 | CPython 3.13 이상 | 수집·파싱·분석 생태계가 풍부하고, 표준 라이브러리의 `sqlite3`, `argparse`, `logging`으로 초기 의존성을 낮출 수 있다. | 초기화 PR에서는 3.13 계열을 제안하며, 최종 상태는 [결정 기록 0002](../decisions/0002-python-3-13-bootstrap-runtime.md)에서 관리한다. |
+| 언어·런타임 | CPython 3.13 | 수집·파싱·분석 생태계가 풍부하고, 표준 라이브러리의 `sqlite3`, `argparse`, `logging`으로 초기 의존성을 낮출 수 있다. | Python 3.14 이상으로 올릴 때는 호환성 검토와 [결정 기록 0002](../decisions/0002-python-3-13-bootstrap-runtime.md) 갱신이 필요하다. |
 | 프로젝트·의존성 관리 | `uv`와 `pyproject.toml`·lockfile | Python 버전, 환경, 의존성, lockfile을 한 도구로 관리할 수 있다. | 패키지 배포나 workspace 구성 |
 | 첫 실행 형태 | `argparse` 기반 CLI | 수집을 재현·테스트하기 쉽고 API나 웹 UI 없이도 수동 실행과 스케줄러 연결이 가능하다. | HTTP API, 웹 애플리케이션, 대시보드 |
 | 저장 방식 | 표준 라이브러리 `sqlite3`와 명시적 SQL migration | 별도 서버 없이 디스크 기반 저장을 시작할 수 있고, 이후 더 큰 DB로 옮길 경로가 있다. | ORM, 외부 DB, 벡터 DB |
