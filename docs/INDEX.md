@@ -8,12 +8,12 @@
 
 ## Current Phase
 
-현재 활성 단계는 **2단계: 기술 스택 선정**이다.
+현재 활성 단계는 **3단계: AI 기술 뉴스 수집 및 보관**이다.
 
 현재 작업에서는 다음 순서로 읽는다.
 
 1. [AGENTS.md](../AGENTS.md)
-2. [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md)
+2. [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md)
 3. 작업과 직접 관련된 문서
 
 단계 전환은 완료 조건을 검토한 뒤 사용자가 명시적으로 결정한다.
@@ -44,8 +44,8 @@
 | 단계 문서 | 상태 | 핵심 산출물 |
 |---|---|---|
 | [1단계: 프로젝트 문서 골격 구성](phases/01-project-foundation.md) | Accepted | 문서 구조와 Codex 작업 경로 |
-| [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md) | Active | 기술 스택 결정과 근거 |
-| [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md) | Draft | 신뢰 가능한 뉴스 수집 기반 |
+| [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md) | Accepted | 기술 스택 결정과 근거 |
+| [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md) | Active | 신뢰 가능한 뉴스 수집 기반 |
 
 4단계 이후의 상세 단계 문서는 해당 단계가 가까워졌을 때 만든다. 전체 방향은 [제품 로드맵](product/roadmap.md)에서 관리한다.
 

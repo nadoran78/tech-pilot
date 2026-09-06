@@ -1,9 +1,9 @@
 # Phase 3: AI Technology News Collection
 
-- **Status:** Draft
+- **Status:** Active
 - **Applies to:** Phase 3
 - **Purpose:** 신규 AI 기술 발표를 발견하고 원본 근거와 함께 축적하는 단계의 경계를 정의한다.
-- **Read when:** 뉴스 수집 요구사항을 논의하거나 3단계 전환을 검토할 때
+- **Read when:** 뉴스 수집 요구사항, 설계와 구현 작업을 시작하거나 검토할 때
 - **Related documents:** [문서 인덱스](../INDEX.md), [제품 로드맵](../product/roadmap.md), [2단계 문서](02-tech-stack-selection.md)
 
 ## Goal
@@ -42,6 +42,10 @@
 - 필요한 결정 기록과 지원 출처 목록
 
 각 문서는 실제 설계가 시작될 때 만들고 인덱스에 연결한다.
+
+## Next Design Work
+
+다음 Issue는 `docs: define news collection architecture and data contract`를 제안한다. 이 작업은 수집 흐름, 최소 뉴스 항목 계약, 출처·근거 정책과 운영 확인 방법을 문서로 정의한다. 실제 RSS 요청, SQLite schema와 수집기 구현은 그 설계가 승인된 뒤 별도 Issue로 분리한다.
 
 ## Non-Goals
 
