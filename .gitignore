@@ -5,8 +5,21 @@
 .env.*
 !.env.example
 
+# Python virtual environments and tool caches
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
 # Local logs
 *.log
 
 # Local collection data
 data/
+
+# Playground
+playground/**

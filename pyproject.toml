@@ -1,0 +1,39 @@
+[project]
+name = "tech-pilot"
+version = "0.1.0"
+description = "Personal AI CTO news collection foundation"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "feedparser>=6.0.11",
+    "httpx>=0.28.1",
+]
+
+[project.scripts]
+tech-pilot = "tech_pilot.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "pytest>=8.3.5",
+    "ruff>=0.12.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.13"
+files = ["src"]
+warn_unused_configs = true
