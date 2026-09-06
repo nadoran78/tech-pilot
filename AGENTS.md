@@ -10,13 +10,13 @@
 
 ## Current Phase
 
-현재 활성 단계는 **2단계: 기술 스택 선정**이다.
+현재 활성 단계는 **3단계: AI 기술 뉴스 수집 및 보관**이다.
 
-- 현재 범위와 완료 조건: [2단계 문서](docs/phases/02-tech-stack-selection.md)
+- 현재 범위와 완료 조건: [3단계 문서](docs/phases/03-news-collection.md)
 - 전체 단계와 전환 원칙: [제품 로드맵](docs/product/roadmap.md)
 - 전체 문서 목록: [문서 인덱스](docs/INDEX.md)
 
-사용자가 단계 전환을 명시적으로 결정하기 전에는 다음 단계로 넘어가지 않는다. 현재 기술 스택 기준은 [기술 스택 문서](docs/architecture/tech-stack.md)에 있으며, 기능 코드나 장기 운영 인프라는 별도 Issue와 사용자 요청이 있을 때만 작성한다.
+사용자가 단계 전환을 명시적으로 결정하기 전에는 다음 단계로 넘어가지 않는다. 2단계에서 확정한 기술 기준은 [기술 스택 문서](docs/architecture/tech-stack.md)에 있으며, 수집 기능과 장기 운영 인프라는 별도 Issue와 사용자 요청이 있을 때만 작성한다.
 
 ## Required Reading
 
@@ -33,7 +33,7 @@
 - 문서 추가·분리·이동: [문서 harness](docs/process/documentation-harness.md)
 - Issue, 브랜치, PR 또는 병합 작업: [개발 워크플로](docs/process/development-workflow.md)
 - 기술 스택 검토: [2단계 문서](docs/phases/02-tech-stack-selection.md), [결정 기록 안내](docs/decisions/README.md)
-- 뉴스 수집 설계: [3단계 문서](docs/phases/03-news-collection.md). 단, 3단계가 활성화된 이후에만 상세 설계를 확정한다.
+- 뉴스 수집 설계: [3단계 문서](docs/phases/03-news-collection.md)
 
 ## Working Rules
 
@@ -75,7 +75,7 @@
 
 ## Verification
 
-기술 스택과 초기 검증 명령의 기준은 [기술 스택 문서](docs/architecture/tech-stack.md)에 있다. 아직 프로젝트를 초기화하지 않았으므로, 설치되지 않은 도구나 실행하지 않은 명령을 통과한 것처럼 보고하지 않는다.
+기술 스택과 초기 검증 명령의 기준은 [기술 스택 문서](docs/architecture/tech-stack.md)에 있다. 실행 명령은 실제 변경 범위에 맞춰 선택하며, 실행하지 않은 명령을 통과한 것처럼 보고하지 않는다.
 
 문서 변경 시에는 최소한 다음을 확인한다.
 

@@ -1,14 +1,23 @@
 # Phase 2: Tech Stack Selection
 
-- **Status:** Active
+- **Status:** Accepted
 - **Applies to:** Phase 2
 - **Purpose:** 뉴스 수집 MVP에 적합한 기술 스택을 비교하고 근거와 함께 확정한다.
-- **Read when:** 1단계가 완료되어 기술 선택을 준비하거나 검토할 때
+- **Read when:** 2단계의 결정 근거를 검토하거나 3단계에서 기술 기준을 참조할 때
 - **Related documents:** [문서 인덱스](../INDEX.md), [제품 로드맵](../product/roadmap.md), [결정 기록 안내](../decisions/README.md), [3단계 문서](03-news-collection.md)
 
 ## Goal
 
 장기적인 가능성만 보고 복잡한 구조를 선택하지 않으면서, 3단계 뉴스 수집기를 안정적으로 개발하고 확장할 수 있는 최소 기술 기반을 결정한다.
+
+## Completion Evidence
+
+사용자가 2026-09-06에 2단계 완료와 3단계 전환을 승인했다. 완료 근거는 다음과 같다.
+
+- [뉴스 수집 MVP 기술 스택](../architecture/tech-stack.md)과 [결정 기록 0001](../decisions/0001-news-collection-mvp-tech-stack.md)이 승인됐다.
+- Python 3.13 세부 선택이 [결정 기록 0002](../decisions/0002-python-3-13-bootstrap-runtime.md)에 승인됐다.
+- Issue #7과 PR #8에서 `uv` 프로젝트 구조, 최소 CLI, lockfile과 format·lint·type-check·test 명령을 검증했다.
+- 3단계 전에 검증할 RSS·Atom 품질, HTTP 정책, SQLite 실행 잠금과 출처 정책 위험은 [기술 스택 문서](../architecture/tech-stack.md)에 남겼다.
 
 ## Prerequisites
 
@@ -45,7 +54,7 @@
 4. 선택과 기각한 대안, 장단점을 결정 기록에 남긴다.
 5. 확정된 선택을 하나의 기술 스택 문서로 연결한다.
 
-사용자 승인 없이 기능 구현이나 장기 운영 인프라 구축을 시작하지 않는다. 타당성 실험이 필요하면 목적과 폐기 기준을 먼저 합의한다.
+이 단계는 완료됐다. 후속 수집 설계와 구현은 3단계 범위와 별도 Issue에서 진행한다.
 
 ## Deliverables
 
