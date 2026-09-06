@@ -20,3 +20,6 @@ dist/
 
 # Local collection data
 data/
+
+# Playground
+playground/**
