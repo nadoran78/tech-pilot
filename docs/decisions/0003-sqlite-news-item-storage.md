@@ -15,7 +15,7 @@
 
 초기 구현은 명시적 SQL migration으로 `schema_migrations`와 `news_items`만 만든다.
 
-- migration 버전과 적용 시각은 `schema_migrations`에 한 번씩 기록한다.
+- 각 migration의 SQL과 버전·적용 시각 기록은 하나의 SQLite savepoint로 원자적으로 적용한다.
 - `news_items`는 뉴스 항목 계약의 필수 필드, 선택 필드, 근거 URL과 수집 시각을 보관한다.
 - `(source_id, external_id)`는 external ID가 있을 때만 고유하며, `canonical_url`은 전역적으로 고유하다.
 - 저장 전에 두 기술적 식별자를 각각 조회한다. 하나만 일치하면 중복으로 반환하고, 서로 다른 기존 항목을 가리키면 어떤 항목도 변경하지 않고 `review_required`를 반환한다.

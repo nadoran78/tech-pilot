@@ -69,9 +69,23 @@ def apply_migrations(connection: sqlite3.Connection) -> None:
     for migration in MIGRATIONS:
         if migration.version in applied_versions:
             continue
+        _apply_migration(connection, migration)
+
+
+def _apply_migration(connection: sqlite3.Connection, migration: Migration) -> None:
+    """Apply one migration atomically, including its version record."""
+
+    savepoint = f"migration_{migration.version}"
+    connection.execute(f"SAVEPOINT {savepoint}")
+    try:
         for statement in migration.statements:
             connection.execute(statement)
         connection.execute(
             "INSERT INTO schema_migrations(version, name, applied_at) VALUES (?, ?, ?)",
             (migration.version, migration.name, datetime.now(UTC).isoformat()),
         )
+    except sqlite3.DatabaseError:
+        connection.execute(f"ROLLBACK TO SAVEPOINT {savepoint}")
+        connection.execute(f"RELEASE SAVEPOINT {savepoint}")
+        raise
+    connection.execute(f"RELEASE SAVEPOINT {savepoint}")

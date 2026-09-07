@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from tech_pilot.storage import NewsItem, SQLiteNewsRepository, StoreStatus
+from tech_pilot.storage import NewsItem, SQLiteNewsRepository, StoreStatus, migrations
+from tech_pilot.storage.migrations import Migration, apply_migrations
 
 
 def make_item(**overrides: object) -> NewsItem:
@@ -42,6 +43,57 @@ def test_migrations_are_applied_once(tmp_path: Path) -> None:
 
     assert rows == [(1, "create_news_items")]
     assert table == ("news_items",)
+
+
+def test_failed_migration_rolls_back_before_retry(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    database_path = tmp_path / "news.sqlite3"
+    SQLiteNewsRepository(database_path).migrate()
+    failed_migration = Migration(
+        version=2,
+        name="create_retryable_table",
+        statements=(
+            "CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",
+            "CREATE INDEX retryable_items_missing_column ON retryable_items(missing_column)",
+        ),
+    )
+    completed_migration = Migration(
+        version=2,
+        name="create_retryable_table",
+        statements=("CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",),
+    )
+
+    with sqlite3.connect(database_path) as connection:
+        monkeypatch.setattr(migrations, "MIGRATIONS", (*migrations.MIGRATIONS, failed_migration))
+        with pytest.raises(sqlite3.OperationalError):
+            apply_migrations(connection)
+
+        table = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
+        ).fetchone()
+        version = connection.execute(
+            "SELECT version FROM schema_migrations WHERE version = 2"
+        ).fetchone()
+
+        assert table is None
+        assert version is None
+
+        monkeypatch.setattr(
+            migrations, "MIGRATIONS", (*migrations.MIGRATIONS[:1], completed_migration)
+        )
+        apply_migrations(connection)
+
+    with sqlite3.connect(database_path) as connection:
+        table = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
+        ).fetchone()
+        version = connection.execute(
+            "SELECT version FROM schema_migrations WHERE version = 2"
+        ).fetchone()
+
+    assert table == ("retryable_items",)
+    assert version == (2,)
 
 
 def test_stores_and_reads_all_news_item_fields(tmp_path: Path) -> None:
