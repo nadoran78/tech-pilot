@@ -52,6 +52,12 @@
 |---|---|---|
 | [출처·근거 정책](policies/source-and-evidence.md) | Accepted | 어떤 출처를 어떤 근거와 접근 정책 아래 수집하는가? |
 
+## Decisions
+
+| 문서 | 상태 | 답하는 질문 |
+|---|---|---|
+| [0003: SQLite 뉴스 항목 저장](decisions/0003-sqlite-news-item-storage.md) | Proposed | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |
+
 ## Phases
 
 | 단계 문서 | 상태 | 핵심 산출물 |
@@ -66,7 +72,7 @@
 
 다음 문서는 필요 시점 전에는 만들지 않는다.
 
-- `docs/decisions/NNNN-*.md`: 중요한 결정을 확정할 때
+- `docs/decisions/NNNN-*.md`: 중요한 결정을 기록할 때
 - `docs/runbooks/news-collection.md`: 실제 수집기의 운영 방법이 생겼을 때
 - `docs/integrations/obsidian-quartz.md`: 뉴스 품질 검토 후 Obsidian Markdown 작성과 기존 Quartz 블로그 경로 복사를 활성화할 때
 - `docs/runbooks/release.md`: 배포 환경이 정해져 release와 hotfix 절차를 운영할 때
