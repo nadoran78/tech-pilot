@@ -52,6 +52,12 @@
 |---|---|---|
 | [출처·근거 정책](policies/source-and-evidence.md) | Accepted | 어떤 출처를 어떤 근거와 접근 정책 아래 수집하는가? |
 
+## Sources
+
+| 문서 | 상태 | 답하는 질문 |
+|---|---|---|
+| [Hugging Face Blog RSS](sources/hugging-face-blog-rss.md) | Accepted | 첫 RSS 출처의 접근 조건과 항목 품질은 무엇인가? |
+
 ## Decisions
 
 | 문서 | 상태 | 답하는 질문 |
