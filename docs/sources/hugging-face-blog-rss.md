@@ -1,6 +1,6 @@
-# Proposed Source: Hugging Face Blog RSS
+# Source: Hugging Face Blog RSS
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Applies to:** Phase 3 initial source candidate
 - **Purpose:** Hugging Face Blog RSS를 첫 AI 기술 뉴스 출처로 승인할 수 있는지 판단하는 근거를 기록한다.
 - **Read when:** 이 출처를 등록·수집하거나 RSS adapter를 구현·검토할 때
@@ -41,7 +41,7 @@
 
 ## Approval Assessment
 
-**제안 결론:** 첫 RSS 출처 후보로 적합하지만, 아직 사용자 승인 전이므로 `Proposed`로 유지한다.
+**승인 결론:** 사용자가 2026-09-07에 이 기록을 승인했다. Hugging Face Blog RSS를 첫 수집 출처로 사용하되, 아래 접근 조건을 지킨다.
 
 승인 시 다음 조건을 지킨다.
 
@@ -52,4 +52,4 @@
 
 ## Follow-up
 
-사용자가 이 출처를 승인한 뒤에만 별도 Issue에서 RSS adapter, 항목 정규화, repository 연결과 네트워크 없는 fixture 테스트를 구현한다.
+별도 Issue에서 RSS adapter, 항목 정규화, repository 연결과 네트워크 없는 fixture 테스트를 구현한다.

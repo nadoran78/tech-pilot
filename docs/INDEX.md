@@ -56,7 +56,7 @@
 
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
-| [Hugging Face Blog RSS](sources/hugging-face-blog-rss.md) | Proposed | 첫 RSS 출처 후보를 승인할 근거와 접근 조건은 무엇인가? |
+| [Hugging Face Blog RSS](sources/hugging-face-blog-rss.md) | Accepted | 첫 RSS 출처의 접근 조건과 항목 품질은 무엇인가? |
 
 ## Decisions
 
