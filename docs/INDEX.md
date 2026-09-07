@@ -38,19 +38,19 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [뉴스 수집 MVP 기술 스택](architecture/tech-stack.md) | Accepted | 뉴스 수집 MVP의 최소 기술 기반과 의도적으로 보류한 항목은 무엇인가? |
-| [뉴스 수집 아키텍처](architecture/news-collection.md) | Draft | 수집 컴포넌트의 책임과 데이터 흐름은 어떻게 나누는가? |
+| [뉴스 수집 아키텍처](architecture/news-collection.md) | Accepted | 수집 컴포넌트의 책임과 데이터 흐름은 어떻게 나누는가? |
 
 ## Specifications
 
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
-| [뉴스 항목 계약](specs/news-item.md) | Draft | 수집·보관할 최소 뉴스 항목과 기술적 중복 기준은 무엇인가? |
+| [뉴스 항목 계약](specs/news-item.md) | Accepted | 수집·보관할 최소 뉴스 항목과 기술적 중복 기준은 무엇인가? |
 
 ## Policies
 
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
-| [출처·근거 정책](policies/source-and-evidence.md) | Draft | 어떤 출처를 어떤 근거와 접근 정책 아래 수집하는가? |
+| [출처·근거 정책](policies/source-and-evidence.md) | Accepted | 어떤 출처를 어떤 근거와 접근 정책 아래 수집하는가? |
 
 ## Phases
 

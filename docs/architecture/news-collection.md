@@ -1,6 +1,6 @@
 # News Collection Architecture
 
-- **Status:** Draft
+- **Status:** Accepted
 - **Applies to:** Phase 3
 - **Purpose:** 뉴스 수집 MVP의 컴포넌트 경계, 데이터 흐름과 실패 격리 원칙을 정의한다.
 - **Read when:** 수집기, 출처 어댑터, 저장소 또는 CLI를 구현·검토할 때

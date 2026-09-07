@@ -1,6 +1,6 @@
 # News Item Contract
 
-- **Status:** Draft
+- **Status:** Accepted
 - **Applies to:** Phase 3
 - **Purpose:** 뉴스 수집 MVP가 보관하는 최소 항목, 원본 근거와 기술적 중복 식별 기준을 정의한다.
 - **Read when:** 정규화, 저장소, 출처 어댑터 또는 테스트 fixture를 구현·검토할 때

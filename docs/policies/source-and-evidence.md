@@ -1,6 +1,6 @@
 # Source and Evidence Policy
 
-- **Status:** Draft
+- **Status:** Accepted
 - **Applies to:** Phase 3
 - **Purpose:** 뉴스 출처를 평가·승인하고 원본 근거와 접근 정책을 일관되게 보존하는 기준을 정의한다.
 - **Read when:** 새 출처를 제안·추가하거나 수집 접근 방식과 근거 보존을 검토할 때

@@ -43,7 +43,7 @@
 
 ## Next Implementation Work
 
-이 설계가 사용자 승인으로 `Accepted`가 된 뒤, SQLite 저장·migration과 뉴스 항목 저장소 또는 첫 RSS 출처 어댑터 구현을 별도 Issue로 분리한다.
+사용자가 2026-09-07에 이 설계를 승인했다. 다음 작업은 SQLite 저장·migration과 뉴스 항목 저장소 또는 첫 RSS 출처 어댑터 구현을 별도 Issue로 분리한다.
 
 ## Non-Goals
 
