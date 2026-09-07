@@ -38,6 +38,19 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [뉴스 수집 MVP 기술 스택](architecture/tech-stack.md) | Accepted | 뉴스 수집 MVP의 최소 기술 기반과 의도적으로 보류한 항목은 무엇인가? |
+| [뉴스 수집 아키텍처](architecture/news-collection.md) | Accepted | 수집 컴포넌트의 책임과 데이터 흐름은 어떻게 나누는가? |
+
+## Specifications
+
+| 문서 | 상태 | 답하는 질문 |
+|---|---|---|
+| [뉴스 항목 계약](specs/news-item.md) | Accepted | 수집·보관할 최소 뉴스 항목과 기술적 중복 기준은 무엇인가? |
+
+## Policies
+
+| 문서 | 상태 | 답하는 질문 |
+|---|---|---|
+| [출처·근거 정책](policies/source-and-evidence.md) | Accepted | 어떤 출처를 어떤 근거와 접근 정책 아래 수집하는가? |
 
 ## Phases
 
@@ -54,9 +67,6 @@
 다음 문서는 필요 시점 전에는 만들지 않는다.
 
 - `docs/decisions/NNNN-*.md`: 중요한 결정을 확정할 때
-- `docs/architecture/news-collection.md`: 3단계에서 수집 구조를 설계할 때
-- `docs/specs/news-item.md`: 3단계에서 뉴스 데이터 계약을 정의할 때
-- `docs/policies/source-and-evidence.md`: 3단계에서 출처 정책을 확정할 때
 - `docs/runbooks/news-collection.md`: 실제 수집기의 운영 방법이 생겼을 때
 - `docs/integrations/obsidian-quartz.md`: 뉴스 품질 검토 후 Obsidian Markdown 작성과 기존 Quartz 블로그 경로 복사를 활성화할 때
 - `docs/runbooks/release.md`: 배포 환경이 정해져 release와 hotfix 절차를 운영할 때

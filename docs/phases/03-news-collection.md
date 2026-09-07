@@ -4,7 +4,7 @@
 - **Applies to:** Phase 3
 - **Purpose:** 신규 AI 기술 발표를 발견하고 원본 근거와 함께 축적하는 단계의 경계를 정의한다.
 - **Read when:** 뉴스 수집 요구사항, 설계와 구현 작업을 시작하거나 검토할 때
-- **Related documents:** [문서 인덱스](../INDEX.md), [제품 로드맵](../product/roadmap.md), [2단계 문서](02-tech-stack-selection.md)
+- **Related documents:** [문서 인덱스](../INDEX.md), [제품 로드맵](../product/roadmap.md), [수집 아키텍처](../architecture/news-collection.md), [뉴스 항목 계약](../specs/news-item.md), [출처·근거 정책](../policies/source-and-evidence.md)
 
 ## Goal
 
@@ -33,19 +33,17 @@
 
 세부 데이터 필드, 출처 우선순위, 재시도 정책과 어댑터 인터페이스는 이 문서에서 미리 확정하지 않는다.
 
-## Documents to Create When Activated
+## Current Design Documents
 
-- `docs/architecture/news-collection.md`: 수집 흐름과 컴포넌트 경계
-- `docs/specs/news-item.md`: 최소 뉴스 데이터 계약과 중복 식별 규칙
-- `docs/policies/source-and-evidence.md`: 출처 선택, 원문 보존과 근거 정책
-- `docs/runbooks/news-collection.md`: 실행과 장애 확인 방법
-- 필요한 결정 기록과 지원 출처 목록
+- [수집 아키텍처](../architecture/news-collection.md): 수집 흐름과 컴포넌트 경계
+- [뉴스 항목 계약](../specs/news-item.md): 최소 뉴스 데이터 계약과 중복 식별 규칙
+- [출처·근거 정책](../policies/source-and-evidence.md): 출처 선택, 원문 보존과 접근 정책
 
-각 문서는 실제 설계가 시작될 때 만들고 인덱스에 연결한다.
+실제 수집기가 생긴 뒤에는 `docs/runbooks/news-collection.md`를 만들고, 중요한 미결정 사항은 결정 기록과 지원 출처 목록으로 분리한다.
 
-## Next Design Work
+## Next Implementation Work
 
-다음 Issue는 `docs: define news collection architecture and data contract`를 제안한다. 이 작업은 수집 흐름, 최소 뉴스 항목 계약, 출처·근거 정책과 운영 확인 방법을 문서로 정의한다. 실제 RSS 요청, SQLite schema와 수집기 구현은 그 설계가 승인된 뒤 별도 Issue로 분리한다.
+사용자가 2026-09-07에 이 설계를 승인했다. 다음 작업은 SQLite 저장·migration과 뉴스 항목 저장소 또는 첫 RSS 출처 어댑터 구현을 별도 Issue로 분리한다.
 
 ## Non-Goals
 
