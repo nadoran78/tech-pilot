@@ -1,6 +1,6 @@
 # 0003: SQLite News Item Storage
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-09-07
 - **Phase:** 3
 - **Purpose:** 뉴스 항목 계약을 로컬 SQLite에 어떤 최소 단위와 중복 규칙으로 보관할지 제안한다.
@@ -23,6 +23,8 @@
 - 수집 시각은 UTC ISO 8601 문자열로 저장한다. 원문 게시 시각은 시간대 정보를 가진 ISO 8601과 원문 문자열을 함께 보관한다.
 
 `collection_runs`와 `source_observations` 테이블은 coordinator가 실제 관측 데이터를 만들 때 별도 migration으로 추가한다.
+
+사용자가 2026-09-07에 이 결정을 명시적으로 승인했고, 구현은 [PR #14](https://github.com/nadoran78/tech-pilot/pull/14)로 `develop`에 병합됐다.
 
 ## Options Considered
 

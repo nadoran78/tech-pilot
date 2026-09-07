@@ -71,4 +71,4 @@ docs/decisions/0001-short-decision-title.md
 |---|---|---|
 | [0001: 뉴스 수집 MVP 기술 스택](0001-news-collection-mvp-tech-stack.md) | Accepted | MVP의 기술 기반과 의도적으로 보류한 항목은 무엇인가? |
 | [0002: Python 3.13 초기화 런타임](0002-python-3-13-bootstrap-runtime.md) | Accepted | 초기 개발 환경을 어떤 Python 마이너 버전으로 재현하는가? |
-| [0003: SQLite 뉴스 항목 저장](0003-sqlite-news-item-storage.md) | Proposed | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |
+| [0003: SQLite 뉴스 항목 저장](0003-sqlite-news-item-storage.md) | Accepted | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |
