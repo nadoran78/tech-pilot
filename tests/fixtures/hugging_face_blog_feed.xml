@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Hugging Face - Blog</title>
+    <link>https://huggingface.co/blog</link>
+    <description>Fixture for normalization tests.</description>
+    <item>
+      <title>Valid release</title>
+      <pubDate>Sun, 07 Sep 2026 09:00:00 +0900</pubDate>
+      <link>https://huggingface.co/blog/valid-release#summary</link>
+      <guid isPermaLink="false">release-1</guid>
+    </item>
+    <item>
+      <title>URL identified entry</title>
+      <link>https://huggingface.co/blog/url-identified</link>
+    </item>
+    <item>
+      <link>https://huggingface.co/blog/missing-title</link>
+      <guid>missing-title</guid>
+    </item>
+    <item>
+      <title>Invalid link</title>
+      <link>/blog/relative-link</link>
+      <guid>relative-link</guid>
+    </item>
+    <item>
+      <title>Unparseable publication date</title>
+      <pubDate>not-a-date</pubDate>
+      <link>https://huggingface.co/blog/unparseable-date</link>
+      <guid>release-5</guid>
+    </item>
+  </channel>
+</rss>
