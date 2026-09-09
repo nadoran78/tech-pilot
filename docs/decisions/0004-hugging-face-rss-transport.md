@@ -18,7 +18,7 @@ RSS parser와 뉴스 저장소는 독립적으로 검증됐지만, 실제 수동
 - `tech-pilot collect` 한 번은 Hugging Face Blog RSS endpoint에 GET 요청을 한 번만 보낸다.
 - 요청 timeout은 10초이고, user-agent는 `tech-pilot/0.1 (personal news collector)`다.
 - 자동 재시도·backoff는 하지 않는다. 사용자는 오류 요약을 확인한 뒤 필요할 때만 다시 실행한다.
-- 성공 응답의 `ETag`, `Last-Modified`는 출처 ID별 SQLite 상태로 저장하고, 다음 요청에 `If-None-Match`, `If-Modified-Since`로 보낸다.
+- HTTP 2xx 응답 중 RSS가 신뢰할 수 있게 파싱된 경우에만 `ETag`, `Last-Modified`를 출처 ID별 SQLite 상태로 저장하고, 다음 요청에 `If-None-Match`, `If-Modified-Since`로 보낸다.
 - 304 응답은 RSS 파싱·뉴스 저장 없이 변경 없음으로 요약한다.
 - 기본 DB 경로는 gitignore된 `data/tech-pilot.sqlite3`다. CLI 옵션으로 다른 경로를 지정할 수 있다.
 

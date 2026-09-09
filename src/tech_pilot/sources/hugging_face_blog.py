@@ -29,6 +29,7 @@ class RssNormalizationResult:
 
     items: tuple[NewsItem, ...]
     skipped_entries: tuple[SkippedRssEntry, ...]
+    error: str | None = None
 
 
 def normalize_hugging_face_blog_feed(
@@ -37,6 +38,12 @@ def normalize_hugging_face_blog_feed(
     """Normalize one Hugging Face Blog RSS document without making HTTP requests."""
 
     parsed_feed = feedparser.parse(feed_xml)
+    if parsed_feed.bozo:
+        return RssNormalizationResult(
+            items=(),
+            skipped_entries=(),
+            error="RSS parsing failed",
+        )
     items: list[NewsItem] = []
     skipped_entries: list[SkippedRssEntry] = []
 

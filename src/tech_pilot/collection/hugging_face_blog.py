@@ -136,6 +136,13 @@ def collect_hugging_face_blog(
         result.body or "",
         collected_at=collected_at or datetime.now(UTC),
     )
+    if normalized.error is not None:
+        return CollectionSummary(
+            source_id=SOURCE_ID,
+            status=CollectionStatus.FAILED,
+            http_status=result.http_status,
+            error=normalized.error,
+        )
     inserted = 0
     duplicates = 0
     review_required = 0

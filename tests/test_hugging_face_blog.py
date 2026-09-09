@@ -4,6 +4,7 @@ from pathlib import Path
 from tech_pilot.sources import SOURCE_ENDPOINT, SOURCE_ID, normalize_hugging_face_blog_feed
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "hugging_face_blog_feed.xml"
+INVALID_FIXTURE_PATH = Path(__file__).parent / "fixtures" / "invalid_hugging_face_blog_feed.xml"
 COLLECTED_AT = datetime(2026, 9, 7, 1, 0, tzinfo=UTC)
 
 
@@ -57,3 +58,14 @@ def test_skips_invalid_entries_without_stopping_other_normalization() -> None:
         (2, "missing title"),
         (3, "canonical_url must be an absolute HTTP(S) URL"),
     ]
+
+
+def test_returns_a_safe_error_for_a_malformed_feed() -> None:
+    result = normalize_hugging_face_blog_feed(
+        INVALID_FIXTURE_PATH.read_text(encoding="utf-8"),
+        collected_at=COLLECTED_AT,
+    )
+
+    assert result.items == ()
+    assert result.skipped_entries == ()
+    assert result.error == "RSS parsing failed"

@@ -12,6 +12,7 @@ from tech_pilot.sources import SOURCE_ID
 from tech_pilot.storage import SQLiteNewsRepository
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "hugging_face_blog_feed.xml"
+INVALID_FIXTURE_PATH = Path(__file__).parent / "fixtures" / "invalid_hugging_face_blog_feed.xml"
 COLLECTED_AT = datetime(2026, 9, 9, 1, 0, tzinfo=UTC)
 
 
@@ -97,6 +98,71 @@ def test_http_failure_returns_a_safe_summary(tmp_path: Path) -> None:
         error="HTTP 503",
     )
     assert repository.count() == 0
+
+
+def test_malformed_feed_does_not_store_validators_before_recollection(tmp_path: Path) -> None:
+    request_count = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal request_count
+        request_count += 1
+        if request_count == 1:
+            return httpx.Response(
+                200,
+                text=INVALID_FIXTURE_PATH.read_text(encoding="utf-8"),
+                headers={"ETag": '"broken-feed"'},
+                request=request,
+            )
+        assert "If-None-Match" not in request.headers
+        return httpx.Response(
+            200,
+            text=FIXTURE_PATH.read_text(encoding="utf-8"),
+            headers={"ETag": '"fixed-feed"'},
+            request=request,
+        )
+
+    repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
+    with make_client(httpx.MockTransport(handler)) as client:
+        fetcher = HuggingFaceBlogFetcher(client)
+        failed = collect_hugging_face_blog(repository, fetcher, collected_at=COLLECTED_AT)
+        recovered = collect_hugging_face_blog(repository, fetcher, collected_at=COLLECTED_AT)
+
+    assert failed == CollectionSummary(
+        source_id=SOURCE_ID,
+        status=CollectionStatus.FAILED,
+        http_status=200,
+        error="RSS parsing failed",
+    )
+    assert recovered.inserted == 3
+    assert repository.get_http_validators(SOURCE_ID) is not None
+    assert repository.get_http_validators(SOURCE_ID).etag == '"fixed-feed"'
+
+
+def test_collect_command_returns_failure_for_a_safe_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    def fake_collect(
+        repository: SQLiteNewsRepository, fetcher: HuggingFaceBlogFetcher
+    ) -> CollectionSummary:
+        assert repository is not None
+        assert fetcher is not None
+        return CollectionSummary(
+            source_id=SOURCE_ID,
+            status=CollectionStatus.FAILED,
+            http_status=200,
+            error="RSS parsing failed",
+        )
+
+    monkeypatch.setattr(cli, "collect_hugging_face_blog", fake_collect)
+    output = StringIO()
+
+    exit_code = cli.main(
+        ["collect", "--database", str(tmp_path / "news.sqlite3")],
+        stdout=output,
+    )
+
+    assert exit_code == 1
+    assert "오류=RSS parsing failed" in output.getvalue()
 
 
 def test_collect_command_prints_a_human_readable_summary(
