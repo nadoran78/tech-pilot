@@ -8,7 +8,7 @@
 
 ## Scope
 
-이 문서는 첫 수집 MVP의 논리적 경계를 정의한다. SQLite 테이블·migration, 실제 HTTP 요청, CLI 하위 명령과 자동 실행 방식은 후속 구현 Issue에서 결정한다.
+이 문서는 첫 수집 MVP의 논리적 경계를 정의한다. SQLite 테이블·migration은 [0003: SQLite 뉴스 항목 저장](../decisions/0003-sqlite-news-item-storage.md)에서, 첫 Hugging Face RSS의 HTTP 요청·CLI 경계는 [0004: Hugging Face RSS 수집 전송](../decisions/0004-hugging-face-rss-transport.md)에서 관리한다. 다른 출처와 자동 실행 방식은 후속 구현 Issue에서 결정한다.
 
 ## Proposed Flow
 
@@ -60,8 +60,7 @@ CLI collect command
 
 ## Deferred Decisions
 
-- 초기 승인 출처 목록과 출처별 접근 URL
-- SQLite schema와 migration 순서
+- 추가 승인 출처와 출처별 접근 URL
 - URL 정규화의 출처별 예외와 콘텐츠 hash 사용 여부
 - timeout·재시도·backoff·실행 잠금의 구체적 값
 - 수집 실행 결과의 보존 기간과 운영 runbook

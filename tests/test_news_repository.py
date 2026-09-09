@@ -41,7 +41,10 @@ def test_migrations_are_applied_once(tmp_path: Path) -> None:
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'news_items'"
         ).fetchone()
 
-    assert rows == [(1, "create_news_items")]
+    assert rows == [
+        (1, "create_news_items"),
+        (2, "create_source_http_validators"),
+    ]
     assert table == ("news_items",)
 
 
@@ -50,8 +53,9 @@ def test_failed_migration_rolls_back_before_retry(
 ) -> None:
     database_path = tmp_path / "news.sqlite3"
     SQLiteNewsRepository(database_path).migrate()
+    existing_migrations = migrations.MIGRATIONS
     failed_migration = Migration(
-        version=2,
+        version=3,
         name="create_retryable_table",
         statements=(
             "CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",
@@ -59,13 +63,13 @@ def test_failed_migration_rolls_back_before_retry(
         ),
     )
     completed_migration = Migration(
-        version=2,
+        version=3,
         name="create_retryable_table",
         statements=("CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",),
     )
 
     with sqlite3.connect(database_path) as connection:
-        monkeypatch.setattr(migrations, "MIGRATIONS", (*migrations.MIGRATIONS, failed_migration))
+        monkeypatch.setattr(migrations, "MIGRATIONS", (*existing_migrations, failed_migration))
         with pytest.raises(sqlite3.OperationalError):
             apply_migrations(connection)
 
@@ -73,15 +77,13 @@ def test_failed_migration_rolls_back_before_retry(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
         ).fetchone()
         version = connection.execute(
-            "SELECT version FROM schema_migrations WHERE version = 2"
+            "SELECT version FROM schema_migrations WHERE version = 3"
         ).fetchone()
 
         assert table is None
         assert version is None
 
-        monkeypatch.setattr(
-            migrations, "MIGRATIONS", (*migrations.MIGRATIONS[:1], completed_migration)
-        )
+        monkeypatch.setattr(migrations, "MIGRATIONS", (*existing_migrations, completed_migration))
         apply_migrations(connection)
 
     with sqlite3.connect(database_path) as connection:
@@ -89,11 +91,11 @@ def test_failed_migration_rolls_back_before_retry(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
         ).fetchone()
         version = connection.execute(
-            "SELECT version FROM schema_migrations WHERE version = 2"
+            "SELECT version FROM schema_migrations WHERE version = 3"
         ).fetchone()
 
     assert table == ("retryable_items",)
-    assert version == (2,)
+    assert version == (3,)
 
 
 def test_stores_and_reads_all_news_item_fields(tmp_path: Path) -> None:

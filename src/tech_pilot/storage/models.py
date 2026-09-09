@@ -96,6 +96,17 @@ class StoreStatus(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
+class HttpValidators:
+    """HTTP cache validators stored for one approved source."""
+
+    etag: str | None = None
+    last_modified: str | None = None
+
+    def has_values(self) -> bool:
+        return self.etag is not None or self.last_modified is not None
+
+
+@dataclass(frozen=True, slots=True)
 class StoreResult:
     """The result of attempting to persist a news item."""
 
