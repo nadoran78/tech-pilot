@@ -8,7 +8,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from tech_pilot.storage.migrations import apply_migrations
-from tech_pilot.storage.models import NewsItem, StoredNewsItem, StoreResult, StoreStatus
+from tech_pilot.storage.models import (
+    HttpValidators,
+    NewsItem,
+    StoredNewsItem,
+    StoreResult,
+    StoreStatus,
+)
 
 
 class SQLiteNewsRepository:
@@ -101,6 +107,52 @@ class SQLiteNewsRepository:
         assert row is not None
         return int(row[0])
 
+    def get_http_validators(self, source_id: str) -> HttpValidators | None:
+        """Return the most recently stored HTTP validators for ``source_id``."""
+
+        with self._connect() as connection:
+            apply_migrations(connection)
+            row = connection.execute(
+                """
+                SELECT etag, last_modified
+                FROM source_http_validators
+                WHERE source_id = ?
+                """,
+                (_require_source_id(source_id),),
+            ).fetchone()
+        if row is None:
+            return None
+        return HttpValidators(etag=row["etag"], last_modified=row["last_modified"])
+
+    def save_http_validators(self, source_id: str, validators: HttpValidators) -> None:
+        """Replace the HTTP validators for ``source_id`` or clear empty values."""
+
+        normalized_source_id = _require_source_id(source_id)
+        with self._connect() as connection:
+            apply_migrations(connection)
+            if not validators.has_values():
+                connection.execute(
+                    "DELETE FROM source_http_validators WHERE source_id = ?",
+                    (normalized_source_id,),
+                )
+                return
+            connection.execute(
+                """
+                INSERT INTO source_http_validators(source_id, etag, last_modified, updated_at)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(source_id) DO UPDATE SET
+                    etag = excluded.etag,
+                    last_modified = excluded.last_modified,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    normalized_source_id,
+                    validators.etag,
+                    validators.last_modified,
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+
     def _connect(self) -> sqlite3.Connection:
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(self._database_path)
@@ -163,3 +215,11 @@ def _parse_datetime(value: str | None) -> datetime | None:
 
 def _parse_required_datetime(value: str) -> datetime:
     return datetime.fromisoformat(value)
+
+
+def _require_source_id(value: str) -> str:
+    source_id = value.strip()
+    if not source_id:
+        msg = "source_id must not be blank"
+        raise ValueError(msg)
+    return source_id

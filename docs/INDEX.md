@@ -63,6 +63,7 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [0003: SQLite 뉴스 항목 저장](decisions/0003-sqlite-news-item-storage.md) | Accepted | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |
+| [0004: Hugging Face RSS 수집 전송](decisions/0004-hugging-face-rss-transport.md) | Proposed | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
 
 ## Phases
 

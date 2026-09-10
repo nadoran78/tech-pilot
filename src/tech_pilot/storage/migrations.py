@@ -47,6 +47,20 @@ MIGRATIONS = (
             """,
         ),
     ),
+    Migration(
+        version=2,
+        name="create_source_http_validators",
+        statements=(
+            """
+            CREATE TABLE source_http_validators (
+                source_id TEXT PRIMARY KEY,
+                etag TEXT,
+                last_modified TEXT,
+                updated_at TEXT NOT NULL
+            )
+            """,
+        ),
+    ),
 )
 
 
