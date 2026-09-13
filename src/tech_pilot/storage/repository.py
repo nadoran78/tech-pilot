@@ -107,6 +107,25 @@ class SQLiteNewsRepository:
         assert row is not None
         return int(row[0])
 
+    def list_recent(self, limit: int) -> tuple[StoredNewsItem, ...]:
+        """Return at most ``limit`` items ordered by most recent collection time."""
+
+        normalized_limit = _require_positive_limit(limit)
+        with self._connect() as connection:
+            apply_migrations(connection)
+            rows = connection.execute(
+                """
+                SELECT id, source_id, external_id, canonical_url, title, published_at,
+                       published_at_raw, collected_at, evidence_url, source_endpoint,
+                       excerpt, raw_metadata_json
+                FROM news_items
+                ORDER BY collected_at DESC, id DESC
+                LIMIT ?
+                """,
+                (normalized_limit,),
+            ).fetchall()
+        return tuple(_stored_item_from_row(row) for row in rows)
+
     def get_http_validators(self, source_id: str) -> HttpValidators | None:
         """Return the most recently stored HTTP validators for ``source_id``."""
 
@@ -223,3 +242,10 @@ def _require_source_id(value: str) -> str:
         msg = "source_id must not be blank"
         raise ValueError(msg)
     return source_id
+
+
+def _require_positive_limit(value: int) -> int:
+    if value < 1:
+        msg = "limit must be greater than zero"
+        raise ValueError(msg)
+    return value
