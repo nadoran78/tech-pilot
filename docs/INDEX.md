@@ -58,6 +58,12 @@
 |---|---|---|
 | [Hugging Face Blog RSS](sources/hugging-face-blog-rss.md) | Accepted | 첫 RSS 출처의 접근 조건과 항목 품질은 무엇인가? |
 
+## Runbooks
+
+| 문서 | 상태 | 답하는 질문 |
+|---|---|---|
+| [뉴스 수집 수동 운영](runbooks/news-collection.md) | Active | 승인된 RSS 출처를 수동 수집·조회하고 결과를 점검하는 방법은 무엇인가? |
+
 ## Decisions
 
 | 문서 | 상태 | 답하는 질문 |
@@ -80,7 +86,6 @@
 다음 문서는 필요 시점 전에는 만들지 않는다.
 
 - `docs/decisions/NNNN-*.md`: 중요한 결정을 기록할 때
-- `docs/runbooks/news-collection.md`: 실제 수집기의 운영 방법이 생겼을 때
 - `docs/integrations/obsidian-quartz.md`: 뉴스 품질 검토 후 Obsidian Markdown 작성과 기존 Quartz 블로그 경로 복사를 활성화할 때
 - `docs/runbooks/release.md`: 배포 환경이 정해져 release와 hotfix 절차를 운영할 때
 

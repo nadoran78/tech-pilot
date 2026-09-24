@@ -39,11 +39,11 @@
 - [뉴스 항목 계약](../specs/news-item.md): 최소 뉴스 데이터 계약과 중복 식별 규칙
 - [출처·근거 정책](../policies/source-and-evidence.md): 출처 선택, 원문 보존과 접근 정책
 
-실제 수집기가 생긴 뒤에는 `docs/runbooks/news-collection.md`를 만들고, 중요한 미결정 사항은 결정 기록과 지원 출처 목록으로 분리한다.
+수동 수집과 조회 절차는 [뉴스 수집 수동 운영 runbook](../runbooks/news-collection.md)에서 관리한다. 중요한 미결정 사항은 결정 기록과 지원 출처 목록으로 분리한다.
 
-## Next Implementation Work
+## Current Implementation State
 
-사용자가 2026-09-07에 이 설계를 승인했다. 다음 작업은 SQLite 저장·migration과 뉴스 항목 저장소 또는 첫 RSS 출처 어댑터 구현을 별도 Issue로 분리한다.
+사용자가 2026-09-07에 이 설계를 승인했다. SQLite 뉴스 항목 저장·migration, 첫 Hugging Face Blog RSS 수동 수집, 기본 조회 CLI와 수동 운영 runbook은 각각 별도 Issue로 구현됐다. 이후 작업은 실제 수집 품질 검토 결과를 바탕으로 별도 Issue로 분리한다.
 
 ## Non-Goals
 
