@@ -19,6 +19,7 @@ from tech_pilot.collection import (
 from tech_pilot.storage import SQLiteNewsRepository
 
 DEFAULT_DATABASE_PATH = Path("data/tech-pilot.sqlite3")
+DEFAULT_LIST_LIMIT = 20
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,6 +41,19 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_DATABASE_PATH,
         help="SQLite 데이터베이스 경로 (기본값: data/tech-pilot.sqlite3)",
     )
+    list_parser = subparsers.add_parser("list", help="저장된 뉴스 항목을 최신순으로 조회합니다.")
+    list_parser.add_argument(
+        "--database",
+        type=Path,
+        default=DEFAULT_DATABASE_PATH,
+        help="SQLite 데이터베이스 경로 (기본값: data/tech-pilot.sqlite3)",
+    )
+    list_parser.add_argument(
+        "--limit",
+        type=_positive_int,
+        default=DEFAULT_LIST_LIMIT,
+        help=f"표시할 최대 항목 수 (기본값: {DEFAULT_LIST_LIMIT})",
+    )
     return parser
 
 
@@ -47,10 +61,14 @@ def main(argv: Sequence[str] | None = None, *, stdout: TextIO | None = None) -> 
     """Run a manual collection command or validate the root CLI arguments."""
 
     args = build_parser().parse_args(argv)
-    if args.command != "collect":
+    if args.command is None:
         return 0
 
     output = stdout if stdout is not None else sys.stdout
+    if args.command == "list":
+        _list_news_items(output, args.database, args.limit)
+        return 0
+
     with httpx.Client() as client:
         summary = collect_hugging_face_blog(
             SQLiteNewsRepository(args.database),
@@ -60,6 +78,27 @@ def main(argv: Sequence[str] | None = None, *, stdout: TextIO | None = None) -> 
     if summary.status.value == "failed":
         return 1
     return 0
+
+
+def _list_news_items(output: TextIO, database_path: Path, limit: int) -> None:
+    if not database_path.exists():
+        print("저장된 뉴스 항목이 없습니다.", file=output)
+        return
+
+    items = SQLiteNewsRepository(database_path).list_recent(limit)
+    if not items:
+        print("저장된 뉴스 항목이 없습니다.", file=output)
+        return
+
+    for stored in items:
+        item = stored.item
+        published_at = item.published_at.isoformat() if item.published_at is not None else "-"
+        print(
+            "뉴스 "
+            f"#{stored.id}: 제목={item.title}, 출처={item.source_id}, 원문={item.evidence_url}, "
+            f"발표시각={published_at}, 수집시각={item.collected_at.isoformat()}",
+            file=output,
+        )
 
 
 def _write_summary(output: TextIO, summary: CollectionSummary) -> None:
@@ -77,3 +116,13 @@ def _write_summary(output: TextIO, summary: CollectionSummary) -> None:
     if summary.error is not None:
         fields.append(f"오류={summary.error}")
     print("수집 결과: " + ", ".join(fields), file=output)
+
+
+def _positive_int(value: str) -> int:
+    try:
+        integer = int(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("양의 정수를 입력해야 합니다.") from error
+    if integer < 1:
+        raise argparse.ArgumentTypeError("양의 정수를 입력해야 합니다.")
+    return integer

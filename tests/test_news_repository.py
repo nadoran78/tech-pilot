@@ -113,6 +113,48 @@ def test_stores_and_reads_all_news_item_fields(tmp_path: Path) -> None:
     assert stored.item.raw_metadata == {"author": "Example"}
 
 
+def test_lists_recent_items_in_stable_order_with_a_limit(tmp_path: Path) -> None:
+    repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
+    oldest = repository.store(make_item(collected_at=datetime(2026, 9, 7, 1, 0, tzinfo=UTC)))
+    newest = repository.store(
+        make_item(
+            external_id="release-2",
+            canonical_url="https://example.com/releases/2",
+            title="Release two",
+            evidence_url="https://example.com/releases/2",
+            collected_at=datetime(2026, 9, 8, 1, 0, tzinfo=UTC),
+        )
+    )
+    same_time = repository.store(
+        make_item(
+            external_id="release-3",
+            canonical_url="https://example.com/releases/3",
+            title="Release three",
+            evidence_url="https://example.com/releases/3",
+            collected_at=datetime(2026, 9, 8, 1, 0, tzinfo=UTC),
+        )
+    )
+
+    recent = repository.list_recent(2)
+
+    assert [item.id for item in recent] == [same_time.item_id, newest.item_id]
+    assert oldest.item_id not in [item.id for item in recent]
+
+
+def test_lists_no_items_from_an_empty_repository(tmp_path: Path) -> None:
+    repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
+
+    assert repository.list_recent(20) == ()
+
+
+@pytest.mark.parametrize("limit", [0, -1])
+def test_rejects_non_positive_list_limit(tmp_path: Path, limit: int) -> None:
+    repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
+
+    with pytest.raises(ValueError, match="limit must be greater than zero"):
+        repository.list_recent(limit)
+
+
 def test_same_source_and_external_id_is_a_duplicate(tmp_path: Path) -> None:
     repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
     first = repository.store(make_item())
