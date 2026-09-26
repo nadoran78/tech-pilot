@@ -113,32 +113,58 @@ def test_stores_and_reads_all_news_item_fields(tmp_path: Path) -> None:
     assert stored.item.raw_metadata == {"author": "Example"}
 
 
-def test_lists_recent_items_in_stable_order_with_a_limit(tmp_path: Path) -> None:
+def test_lists_items_by_published_time_then_stable_fallbacks(tmp_path: Path) -> None:
     repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
-    oldest = repository.store(make_item(collected_at=datetime(2026, 9, 7, 1, 0, tzinfo=UTC)))
-    newest = repository.store(
+    no_published_time = repository.store(
+        make_item(
+            external_id="no-published-time",
+            canonical_url="https://example.com/releases/no-published-time",
+            title="No published time",
+            evidence_url="https://example.com/releases/no-published-time",
+            published_at=None,
+            collected_at=datetime(2026, 9, 12, 1, 0, tzinfo=UTC),
+        )
+    )
+    earlier_published_time = repository.store(
+        make_item(
+            external_id="earlier-published-time",
+            canonical_url="https://example.com/releases/earlier-published-time",
+            title="Earlier published time",
+            evidence_url="https://example.com/releases/earlier-published-time",
+            published_at=datetime(2026, 9, 10, 9, 0, tzinfo=timezone(timedelta(hours=9))),
+            collected_at=datetime(2026, 9, 13, 1, 0, tzinfo=UTC),
+        )
+    )
+    earlier_collection_time = repository.store(
         make_item(
             external_id="release-2",
             canonical_url="https://example.com/releases/2",
-            title="Release two",
+            title="Earlier collection time",
             evidence_url="https://example.com/releases/2",
+            published_at=datetime(2026, 9, 10, 0, 30, tzinfo=UTC),
             collected_at=datetime(2026, 9, 8, 1, 0, tzinfo=UTC),
         )
     )
-    same_time = repository.store(
+    later_collection_time = repository.store(
         make_item(
             external_id="release-3",
             canonical_url="https://example.com/releases/3",
-            title="Release three",
+            title="Later collection time",
             evidence_url="https://example.com/releases/3",
-            collected_at=datetime(2026, 9, 8, 1, 0, tzinfo=UTC),
+            published_at=datetime(2026, 9, 10, 0, 30, tzinfo=UTC),
+            collected_at=datetime(2026, 9, 9, 1, 0, tzinfo=UTC),
         )
     )
 
-    recent = repository.list_recent(2)
+    recent = repository.list_recent(3)
+    all_items = repository.list_recent(20)
 
-    assert [item.id for item in recent] == [same_time.item_id, newest.item_id]
-    assert oldest.item_id not in [item.id for item in recent]
+    assert [item.id for item in recent] == [
+        later_collection_time.item_id,
+        earlier_collection_time.item_id,
+        earlier_published_time.item_id,
+    ]
+    assert all_items[-1].id == no_published_time.item_id
 
 
 def test_lists_no_items_from_an_empty_repository(tmp_path: Path) -> None:
