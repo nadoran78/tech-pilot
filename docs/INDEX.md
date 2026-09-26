@@ -57,6 +57,7 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [Hugging Face Blog RSS](sources/hugging-face-blog-rss.md) | Accepted | 첫 RSS 출처의 접근 조건과 항목 품질은 무엇인가? |
+| [OpenAI News RSS](sources/openai-news-rss.md) | Proposed | 두 번째 RSS 후보 출처를 승인하거나 보류할 근거는 무엇인가? |
 
 ## Runbooks
 

@@ -39,6 +39,8 @@ RSS 2.0은 XML 기반 웹 콘텐츠 신디케이션 형식이며 item 요소를 
 
 승인 기록에는 실제 비밀 값이나 접근 token을 넣지 않는다. 인증이 필요한 출처는 환경 변수 이름과 필요한 권한만 기록하고 값은 로컬 설정에 둔다.
 
+현재 후보 출처의 조사 결과와 승인 상태는 [OpenAI News RSS](../sources/openai-news-rss.md)처럼 출처별 문서에서 관리한다. `Proposed` 상태는 수집 구현이나 자동 접근의 승인이 아니다.
+
 ## Evidence Handling
 
 - 각 뉴스 항목은 `evidence_url`, `source_endpoint`, 출처가 준 제목·시각·외부 ID와 `collected_at`을 보존한다.
