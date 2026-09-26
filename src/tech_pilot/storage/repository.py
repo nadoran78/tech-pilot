@@ -108,7 +108,7 @@ class SQLiteNewsRepository:
         return int(row[0])
 
     def list_recent(self, limit: int) -> tuple[StoredNewsItem, ...]:
-        """Return at most ``limit`` items ordered by most recent collection time."""
+        """Return at most ``limit`` items ordered by published time, then collection time."""
 
         normalized_limit = _require_positive_limit(limit)
         with self._connect() as connection:
@@ -119,7 +119,11 @@ class SQLiteNewsRepository:
                        published_at_raw, collected_at, evidence_url, source_endpoint,
                        excerpt, raw_metadata_json
                 FROM news_items
-                ORDER BY collected_at DESC, id DESC
+                ORDER BY
+                    published_at IS NULL ASC,
+                    julianday(published_at) DESC,
+                    collected_at DESC,
+                    id DESC
                 LIMIT ?
                 """,
                 (normalized_limit,),

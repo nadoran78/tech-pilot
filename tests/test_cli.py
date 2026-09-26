@@ -28,7 +28,8 @@ def test_list_command_prints_recent_stored_items(tmp_path: Path) -> None:
             external_id="older",
             canonical_url="https://huggingface.co/blog/older",
             title="Older post",
-            collected_at=datetime(2026, 9, 10, 1, 0, tzinfo=UTC),
+            published_at=datetime(2026, 9, 9, 9, 0, tzinfo=UTC),
+            collected_at=datetime(2026, 9, 12, 1, 0, tzinfo=UTC),
             evidence_url="https://huggingface.co/blog/older",
             source_endpoint="https://huggingface.co/blog/feed.xml",
         )

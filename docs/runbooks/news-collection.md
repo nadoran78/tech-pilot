@@ -52,7 +52,7 @@ uv run tech-pilot list --limit 20
 uv run tech-pilot list --database /path/to/news.sqlite3 --limit 20
 ```
 
-목록은 `collected_at` 내림차순, 같은 수집 시각에서는 저장 ID 내림차순이다. 따라서 한 번의 대량 수집 안에서는 발표 시각 순위가 아니라 feed 처리·저장 순서를 보게 될 수 있다. 현재 `list`는 품질 확인용 최소 인터페이스이며, 발표일 기준 정렬·검색·필터링은 제공하지 않는다.
+목록은 발표 시각이 있는 항목을 실제 시점 기준 내림차순으로 먼저 표시한다. 발표 시각이 같으면 수집 시각과 저장 ID 내림차순을 사용하며, 발표 시각이 없는 항목은 마지막에 표시한다. 현재 `list`는 품질 확인용 최소 인터페이스이며, 검색·필터링은 제공하지 않는다.
 
 ## Interpret the Result
 
