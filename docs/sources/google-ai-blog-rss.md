@@ -4,7 +4,7 @@
 - **Applies to:** Phase 3 approved additional source
 - **Purpose:** Google AI Blog RSS의 제한적 운영 승인 조건, 항목 품질과 접근 근거를 기록한다.
 - **Read when:** Google AI Blog RSS를 검토하거나 구현 승인 여부를 결정할 때
-- **Related documents:** [출처·근거 정책](../policies/source-and-evidence.md), [뉴스 항목 계약](../specs/news-item.md), [뉴스 수집 아키텍처](../architecture/news-collection.md), [3단계 문서](../phases/03-news-collection.md)
+- **Related documents:** [출처·근거 정책](../policies/source-and-evidence.md), [뉴스 항목 계약](../specs/news-item.md), [뉴스 수집 아키텍처](../architecture/news-collection.md), [0005: Google AI Blog RSS 수동 수집 전송](../decisions/0005-google-ai-blog-rss-transport.md), [3단계 문서](../phases/03-news-collection.md)
 
 ## Source
 
@@ -55,6 +55,8 @@ AI 카테고리에는 Gemini, 연구, 개발자 도구 등 발표가 함께 포�
 - 자동 재시도·backoff·scheduler 미사용, 뉴스레터·웹사이트·API를 통한 외부 제공 미실시
 
 사용자의 운영 승인은 제3자 약관이나 접근 조건을 대체하지 않으며, endpoint·robots·약관·추가 정책·응답 상태가 바뀌거나 보관·이용 범위를 넓히려면 수집을 중지하고 이 기록을 다시 검토한다. 이 PR은 출처 승인만 다루며, adapter·수동 수집·scheduler를 구현하거나 실행하지 않는다.
+
+구체적인 HTTP 전송 방식과 KST 기준의 하루 1회 제한은 [0005: Google AI Blog RSS 수동 수집 전송](../decisions/0005-google-ai-blog-rss-transport.md)에 `Proposed` 상태로 분리했다. 해당 결정이 승인되기 전에는 이 출처의 adapter나 요청 제한 저장소를 구현하지 않는다.
 
 ## Follow-up
 
