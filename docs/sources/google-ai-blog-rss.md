@@ -1,12 +1,12 @@
-# Source Candidate: Google AI Blog RSS
+# Source: Google AI Blog RSS
 
-- **Status:** Proposed
-- **Applies to:** Phase 3 additional source candidate
-- **Purpose:** Google AI Blog RSS를 수집 후보로 승인·보류·기각할 때 필요한 접근 정책, 항목 품질과 운영 근거를 기록한다.
+- **Status:** Accepted
+- **Applies to:** Phase 3 approved additional source
+- **Purpose:** Google AI Blog RSS의 제한적 운영 승인 조건, 항목 품질과 접근 근거를 기록한다.
 - **Read when:** Google AI Blog RSS를 검토하거나 구현 승인 여부를 결정할 때
 - **Related documents:** [출처·근거 정책](../policies/source-and-evidence.md), [뉴스 항목 계약](../specs/news-item.md), [뉴스 수집 아키텍처](../architecture/news-collection.md), [3단계 문서](../phases/03-news-collection.md)
 
-## Candidate
+## Source
 
 | 항목 | 관찰·제안 값 | 근거와 한계 |
 |---|---|---|
@@ -41,20 +41,20 @@ AI 카테고리에는 Gemini, 연구, 개발자 도구 등 발표가 함께 포�
 
 ## Practical Access Assessment
 
-**권고: 제한적 운영 승인 후보.** 이 후보는 [출처·근거 정책의 실무적 RSS 접근 승인 기준](../policies/source-and-evidence.md#practical-rss-access-approval)에 따라 다음 조건을 충족한다.
+**승인 결론:** 사용자가 2026-09-27에 이 기록의 제한적 운영을 승인했다. 이 출처는 [출처·근거 정책의 실무적 RSS 접근 승인 기준](../policies/source-and-evidence.md#practical-rss-access-approval)에 따라 다음 조건을 충족한다.
 
 1. Google AI Blog가 연결한 공개 RSS endpoint이고, 인증·로그인·접근 제어 우회가 필요하지 않다.
 2. 관찰한 `robots.txt`에 AI RSS endpoint나 AI 카테고리 경로를 차단하는 규칙이 없다.
 3. 관찰한 Google Terms는 machine-readable instructions를 위반하는 자동 접근을 금지하지만, 현재 `robots.txt`를 따르는 최소 메타데이터 수집을 직접 금지하거나 제공자 허가를 요구하는 조항은 확인하지 못했다. 이는 약관 해석의 확정이나 콘텐츠 이용권의 보증은 아니다.
 4. `id`, 제목, 원문 URL, 발표 시각과 수집 시각만 뉴스 항목으로 보관하는 매핑을 제안한다. `updated`와 원문 전문·이미지·첨부 파일은 보관하지 않는다.
 
-사용자가 이 기록을 검토해 운영 승인하면, 다음 범위에서만 별도 구현 Issue를 제안할 수 있다.
+별도 구현 Issue는 다음 범위에서만 제안할 수 있다.
 
 - AI RSS endpoint에 대한 **하루 1회 이하의 수동 요청**
 - 개인용 로컬 SQLite의 내부 조회와 최소 메타데이터 보관
 - 자동 재시도·backoff·scheduler 미사용, 뉴스레터·웹사이트·API를 통한 외부 제공 미실시
 
-`Proposed` 상태는 사용자의 운영 승인 전까지 유지한다. 사용자의 승인은 제3자 약관이나 접근 조건을 대체하지 않으며, endpoint·robots·약관·추가 정책·응답 상태가 바뀌거나 보관·이용 범위를 넓히려면 수집을 중지하고 이 기록을 다시 검토한다.
+사용자의 운영 승인은 제3자 약관이나 접근 조건을 대체하지 않으며, endpoint·robots·약관·추가 정책·응답 상태가 바뀌거나 보관·이용 범위를 넓히려면 수집을 중지하고 이 기록을 다시 검토한다. 이 PR은 출처 승인만 다루며, adapter·수동 수집·scheduler를 구현하거나 실행하지 않는다.
 
 ## Follow-up
 
