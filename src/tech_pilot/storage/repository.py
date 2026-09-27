@@ -6,15 +6,20 @@ import json
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from tech_pilot.storage.migrations import apply_migrations
 from tech_pilot.storage.models import (
+    DailyRequestReservation,
+    DailyRequestReservationStatus,
     HttpValidators,
     NewsItem,
     StoredNewsItem,
     StoreResult,
     StoreStatus,
 )
+
+KST = ZoneInfo("Asia/Seoul")
 
 
 class SQLiteNewsRepository:
@@ -176,6 +181,43 @@ class SQLiteNewsRepository:
                 ),
             )
 
+    def reserve_daily_request(
+        self, source_id: str, *, requested_at: datetime
+    ) -> DailyRequestReservation:
+        """Atomically reserve one source request for the request's KST calendar day.
+
+        A reservation remains after a failed request so a caller can enforce the
+        approved one-request-per-day limit before making an HTTP request.
+        """
+
+        normalized_source_id = _require_source_id(source_id)
+        normalized_requested_at = _require_aware_datetime("requested_at", requested_at)
+        kst_date = normalized_requested_at.astimezone(KST).date()
+        reserved_at = normalized_requested_at.astimezone(UTC)
+
+        with self._connect() as connection:
+            apply_migrations(connection)
+            cursor = connection.execute(
+                """
+                INSERT INTO source_daily_request_reservations(source_id, kst_date, reserved_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(source_id, kst_date) DO NOTHING
+                """,
+                (normalized_source_id, kst_date.isoformat(), reserved_at.isoformat()),
+            )
+
+        status = (
+            DailyRequestReservationStatus.RESERVED
+            if cursor.rowcount == 1
+            else DailyRequestReservationStatus.ALREADY_RESERVED
+        )
+        return DailyRequestReservation(
+            status=status,
+            source_id=normalized_source_id,
+            kst_date=kst_date,
+            reserved_at=reserved_at,
+        )
+
     def _connect(self) -> sqlite3.Connection:
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(self._database_path)
@@ -246,6 +288,13 @@ def _require_source_id(value: str) -> str:
         msg = "source_id must not be blank"
         raise ValueError(msg)
     return source_id
+
+
+def _require_aware_datetime(name: str, value: datetime) -> datetime:
+    if value.tzinfo is None:
+        msg = f"{name} must include a timezone"
+        raise ValueError(msg)
+    return value
 
 
 def _require_positive_limit(value: int) -> int:

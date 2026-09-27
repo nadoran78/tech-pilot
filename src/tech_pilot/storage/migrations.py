@@ -61,6 +61,20 @@ MIGRATIONS = (
             """,
         ),
     ),
+    Migration(
+        version=3,
+        name="create_source_daily_request_reservations",
+        statements=(
+            """
+            CREATE TABLE source_daily_request_reservations (
+                source_id TEXT NOT NULL,
+                kst_date TEXT NOT NULL,
+                reserved_at TEXT NOT NULL,
+                PRIMARY KEY (source_id, kst_date)
+            )
+            """,
+        ),
+    ),
 )
 
 
