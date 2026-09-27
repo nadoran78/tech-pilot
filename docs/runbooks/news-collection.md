@@ -13,7 +13,7 @@
 수집 전에 다음을 확인한다.
 
 1. 현재 출처 기록의 endpoint, 접근 조건과 보관 범위를 [Hugging Face Blog RSS 출처](../sources/hugging-face-blog-rss.md)에서 확인한다.
-2. 최신 `robots.txt`와 Terms of Service 페이지에 접근해, 이전 기록 이후 접근 정책이나 응답 상태가 바뀌지 않았는지 확인한다. robots 규칙은 약관이나 저작권 조건을 대체하지 않는다.
+2. 최신 `robots.txt`, Terms of Service와 출처별 추가 정책을 확인해, 이전 기록 이후 접근 조건이 바뀌지 않았는지 점검한다. 출처 문서의 운영 승인 범위와 달리 인증·접근 제어가 필요해졌거나, 최소 수집을 직접 금지하거나 제공자 허가를 요구하는 조건을 발견하면 수집하지 않고 출처 기록을 재검토한다. robots 규칙은 약관이나 저작권 조건을 대체하지 않는다.
 3. 로컬 환경에서 의존성을 준비한다.
 
 ```bash
@@ -36,7 +36,7 @@ uv run tech-pilot collect
 uv run tech-pilot collect --database /path/to/news.sqlite3
 ```
 
-한 실행은 endpoint에 GET 요청을 한 번만 보낸다. timeout, user-agent, 조건부 요청과 재시도 정책의 현재 제안은 [결정 기록 0004](../decisions/0004-hugging-face-rss-transport.md)를 기준으로 한다. 이 결정은 아직 `Proposed` 상태이므로, 운영 정책을 확정하거나 자동화하지 않는다.
+한 실행은 endpoint에 GET 요청을 한 번만 보낸다. 이는 [출처·근거 정책](../policies/source-and-evidence.md#practical-rss-access-approval)의 제한적 운영 승인 범위에 맞춘 저빈도 수동 요청이다. timeout, user-agent, 조건부 요청과 재시도 정책의 현재 제안은 [결정 기록 0004](../decisions/0004-hugging-face-rss-transport.md)를 기준으로 한다. 이 결정은 아직 `Proposed` 상태이므로, 운영 정책을 확정하거나 자동화하지 않는다.
 
 ## Inspect Stored Items
 
