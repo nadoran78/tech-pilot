@@ -12,7 +12,7 @@
 |---|---|---|
 | `source_id` | `openai-news` | Tech Pilot 내부에서 사용할 제안 식별자다. 아직 구현에 등록하지 않는다. |
 | 운영 주체 | OpenAI | OpenAI 사이트 전역 footer의 RSS 링크가 [endpoint](https://openai.com/news/rss.xml)를 가리키며, 같은 `openai.com` 도메인의 feed 제목이 `OpenAI News`로 관찰됐다. |
-| 접근 방식 | RSS | [RSS endpoint](https://openai.com/news/rss.xml)는 2026-09-26에 익명 HTTP 200과 `text/xml; charset=utf-8`로 응답했다. |
+| 접근 방식 | RSS | [RSS endpoint](https://openai.com/news/rss.xml)는 2026-09-27에 익명 HTTP 200과 `text/xml; charset=utf-8`로 응답했다. |
 | 접근 endpoint | `https://openai.com/news/rss.xml` | 관찰 시 redirect 없이 최종 URL이 같았다. endpoint의 지속성은 보장되지 않는다. |
 | 대표 근거 | 각 item의 `link` | 표본 항목의 링크는 `openai.com` 원문 URL이었다. |
 
@@ -20,7 +20,7 @@
 
 ## Item Quality and Mapping
 
-2026-09-26에 `feedparser`로 응답을 관찰한 결과, XML 파싱 오류 없이 1,230개 entry를 읽었다. 이는 관찰 시점의 결과이며 고정된 항목 수나 feed 계약이 아니다.
+2026-09-27에 `feedparser`로 응답을 관찰한 결과, XML 파싱 오류 없이 1,230개 entry를 읽었다. 이는 관찰 시점의 결과이며 고정된 항목 수나 feed 계약이 아니다.
 
 | RSS 관찰 필드 | 뉴스 항목 계약 필드 | 사용 제안 | 한계 |
 |---|---|---|---|
@@ -33,18 +33,18 @@
 
 ## Access and Policy Evidence
 
-- [robots.txt](https://openai.com/robots.txt)는 2026-09-26에 `User-agent: *`에 대해 `Allow: /`를 제공하고 `/microsoft-for-startups/`만 제외했다. 이는 자동 접근의 유일한 허가나 약관 동의가 아니다.
-- [Terms of Use](https://openai.com/policies/terms-of-use/)는 2026-01-01부터 효력이 있는 것으로 표시되며, 서비스에서 데이터 또는 Output을 자동·프로그램 방식으로 추출하는 행위를 제한한다. 이 조항이 공개 RSS의 최소 메타데이터 수집에 어떻게 적용되는지는 이 문서만으로 확정할 수 없다.
+- [robots.txt](https://openai.com/robots.txt)는 2026-09-27에 `User-agent: *`에 대해 `Allow: /`를 제공하고 `/microsoft-for-startups/`만 제외했다. 이는 자동 접근의 유일한 허가나 약관 동의가 아니다.
+- [Terms of Use](https://openai.com/policies/row-terms-of-use/)는 2026-01-01부터 효력이 있는 것으로 표시되며, 웹사이트를 포함한 Services에서 데이터를 자동·프로그램 방식으로 추출하는 행위를 금지한다. 공개 RSS 또는 최소 메타데이터 보관에 대한 예외·허가 문구는 확인하지 못했다.
 - 관찰한 RSS 응답에는 인증 요구, `ETag`, `Last-Modified`, `RateLimit` header가 없었다. 따라서 조건부 요청·요청 간격·timeout·재시도 정책은 이 후보에 대해 아직 제안하지 않는다.
 - RSS endpoint가 공개돼 있고 같은 도메인의 News를 가리킨다는 사실은 관찰됐다. 그러나 RSS 제공이 자동 수집·보관을 포괄적으로 허가한다는 별도 근거는 확인하지 못했다.
+- 사용자가 2026-09-26에 제공한 OpenAI 고객센터 응답은 공개 문서만으로 이 endpoint의 프로그램 수집·최소 메타데이터 보관을 명시적으로 허용하거나 금지한다고 단정할 근거가 없다고 안내했다. 이 개별 응답은 약관의 예외나 제공자의 명시적 허가가 아니다.
 
-## Assessment
+## Practical Access Assessment
 
-**권고: 보류.** 공개 RSS의 형식과 최소 항목 품질은 수집 후보로 적합해 보이지만, 현재 약관의 자동 추출 제한과 RSS 메타데이터 수집의 관계가 불명확하다. 사용자의 승인이나 위험 인지만으로는 제3자 약관의 불확실성을 해소할 수 없다. 따라서 제공자의 최신·명시적 허용 근거가 확인되기 전에는 adapter, 수동 수집, scheduler를 구현하거나 실행하지 않는다.
+**운영 판단: 제한적 운영 승인 불가.** 이 후보는 [출처·근거 정책의 실무적 RSS 접근 승인 기준](../policies/source-and-evidence.md#practical-rss-access-approval) 중 공식 endpoint, 인증 불필요, robots 비차단과 최소 메타데이터 매핑 조건은 충족한다. 그러나 OpenAI Terms가 웹사이트를 포함한 Services에서 데이터를 자동·프로그램 방식으로 추출하는 행위를 직접 금지하므로, 약관·추가 정책에서 최소 수집을 직접 금지하거나 제공자 허가를 요구하면 승인하지 않는 정책 조건을 충족하지 못한다.
 
-후속 조치는 다음처럼 구분한다.
+RSS 예외가 약관에 명시되지 않았고, 고객센터 응답도 그 적용 범위에 관한 허가를 제공하지 않았다. 이는 약관의 법적 해석을 확정하는 결론이 아니라, 현재 공개 근거에 따른 보수적인 운영 판단이다. 따라서 `Proposed` 상태를 유지하고 adapter, 수동 수집, scheduler를 구현하거나 실행하지 않는다. 사용자의 승인이나 위험 인지만으로는 이 조건을 대체할 수 없다.
 
-1. OpenAI가 공개 RSS의 프로그램 수집·최소 메타데이터 보관을 허용한다는 최신·명시적 근거를 확인한 뒤, 사용자가 구현을 승인하면 그때 구현 Issue를 제안한다.
-2. 사용자가 수집하지 않고 후보를 유지하거나 기각하기로 결정하면, 구현 Issue를 만들지 않고 이 후보 문서의 상태와 근거만 갱신한다.
+## Follow-up
 
-첫 구현 Issue가 제안되더라도 fixture 기반 정규화와 단일 수동 요청으로 제한하고, timeout·user-agent·조건부 요청·재시도는 출처별 결정 기록에서 별도로 검토한다.
+OpenAI가 공개 RSS의 프로그램 수집과 최소 메타데이터 보관을 명시적으로 허용하는 최신 정책·문서 또는 권한 있는 서면 답변을 제공하면 이 기록을 다시 검토한다. 사용자가 수집하지 않고 후보를 유지하거나 기각하기로 결정하면, 구현 Issue를 만들지 않고 이 후보 문서의 상태와 근거만 갱신한다.
