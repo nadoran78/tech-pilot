@@ -1,10 +1,18 @@
 import sqlite3
-from datetime import UTC, datetime, timedelta, timezone
+from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, date, datetime, timedelta, timezone
 from pathlib import Path
+from threading import Barrier
 
 import pytest
 
-from tech_pilot.storage import NewsItem, SQLiteNewsRepository, StoreStatus, migrations
+from tech_pilot.storage import (
+    DailyRequestReservationStatus,
+    NewsItem,
+    SQLiteNewsRepository,
+    StoreStatus,
+    migrations,
+)
 from tech_pilot.storage.migrations import Migration, apply_migrations
 
 
@@ -44,8 +52,88 @@ def test_migrations_are_applied_once(tmp_path: Path) -> None:
     assert rows == [
         (1, "create_news_items"),
         (2, "create_source_http_validators"),
+        (3, "create_source_daily_request_reservations"),
     ]
     assert table == ("news_items",)
+
+
+def test_reserves_only_one_request_per_source_and_kst_date(tmp_path: Path) -> None:
+    database_path = tmp_path / "news.sqlite3"
+    repository = SQLiteNewsRepository(database_path)
+    requested_at = datetime(2026, 9, 27, 15, 0, tzinfo=UTC)
+
+    first = repository.reserve_daily_request("google-ai-blog", requested_at=requested_at)
+    second = repository.reserve_daily_request("google-ai-blog", requested_at=requested_at)
+
+    assert first.status is DailyRequestReservationStatus.RESERVED
+    assert second.status is DailyRequestReservationStatus.ALREADY_RESERVED
+    assert first.kst_date == date(2026, 9, 28)
+    assert first.reserved_at == requested_at
+
+    with sqlite3.connect(database_path) as connection:
+        rows = connection.execute(
+            """
+            SELECT source_id, kst_date, reserved_at
+            FROM source_daily_request_reservations
+            """
+        ).fetchall()
+
+    assert rows == [("google-ai-blog", "2026-09-28", "2026-09-27T15:00:00+00:00")]
+
+
+def test_allows_reservation_for_another_source_or_kst_date(tmp_path: Path) -> None:
+    repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
+    before_midnight_kst = datetime(2026, 9, 27, 14, 59, tzinfo=UTC)
+    after_midnight_kst = datetime(2026, 9, 27, 15, 0, tzinfo=UTC)
+
+    same_source_next_day = repository.reserve_daily_request(
+        "google-ai-blog", requested_at=after_midnight_kst
+    )
+    first_source_first_day = repository.reserve_daily_request(
+        "google-ai-blog", requested_at=before_midnight_kst
+    )
+    other_source_first_day = repository.reserve_daily_request(
+        "hugging-face-blog", requested_at=before_midnight_kst
+    )
+
+    assert same_source_next_day.status is DailyRequestReservationStatus.RESERVED
+    assert same_source_next_day.kst_date == date(2026, 9, 28)
+    assert first_source_first_day.status is DailyRequestReservationStatus.RESERVED
+    assert first_source_first_day.kst_date == date(2026, 9, 27)
+    assert other_source_first_day.status is DailyRequestReservationStatus.RESERVED
+
+
+def test_concurrent_repositories_only_reserve_one_request(tmp_path: Path) -> None:
+    database_path = tmp_path / "news.sqlite3"
+    SQLiteNewsRepository(database_path).migrate()
+    start = Barrier(3)
+    requested_at = datetime(2026, 9, 27, 15, 0, tzinfo=UTC)
+
+    def reserve() -> DailyRequestReservationStatus:
+        start.wait()
+        result = SQLiteNewsRepository(database_path).reserve_daily_request(
+            "google-ai-blog", requested_at=requested_at
+        )
+        return result.status
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [executor.submit(reserve) for _ in range(2)]
+        start.wait()
+        statuses = [future.result() for future in futures]
+
+    assert sorted(statuses) == [
+        DailyRequestReservationStatus.ALREADY_RESERVED,
+        DailyRequestReservationStatus.RESERVED,
+    ]
+
+
+def test_rejects_naive_request_time_for_daily_reservation(tmp_path: Path) -> None:
+    repository = SQLiteNewsRepository(tmp_path / "news.sqlite3")
+
+    with pytest.raises(ValueError, match="requested_at must include a timezone"):
+        repository.reserve_daily_request(
+            "google-ai-blog", requested_at=datetime(2026, 9, 27, 15, 0)
+        )
 
 
 def test_failed_migration_rolls_back_before_retry(
@@ -55,7 +143,7 @@ def test_failed_migration_rolls_back_before_retry(
     SQLiteNewsRepository(database_path).migrate()
     existing_migrations = migrations.MIGRATIONS
     failed_migration = Migration(
-        version=3,
+        version=4,
         name="create_retryable_table",
         statements=(
             "CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",
@@ -63,7 +151,7 @@ def test_failed_migration_rolls_back_before_retry(
         ),
     )
     completed_migration = Migration(
-        version=3,
+        version=4,
         name="create_retryable_table",
         statements=("CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",),
     )
@@ -77,7 +165,7 @@ def test_failed_migration_rolls_back_before_retry(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
         ).fetchone()
         version = connection.execute(
-            "SELECT version FROM schema_migrations WHERE version = 3"
+            "SELECT version FROM schema_migrations WHERE version = 4"
         ).fetchone()
 
         assert table is None
@@ -91,11 +179,11 @@ def test_failed_migration_rolls_back_before_retry(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
         ).fetchone()
         version = connection.execute(
-            "SELECT version FROM schema_migrations WHERE version = 3"
+            "SELECT version FROM schema_migrations WHERE version = 4"
         ).fetchone()
 
     assert table == ("retryable_items",)
-    assert version == (3,)
+    assert version == (4,)
 
 
 def test_stores_and_reads_all_news_item_fields(tmp_path: Path) -> None:
