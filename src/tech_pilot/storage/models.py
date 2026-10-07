@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from enum import StrEnum
 from typing import Mapping
 from urllib.parse import urlsplit, urlunsplit
@@ -93,6 +93,23 @@ class StoreStatus(StrEnum):
     INSERTED = "inserted"
     DUPLICATE = "duplicate"
     REVIEW_REQUIRED = "review_required"
+
+
+class DailyRequestReservationStatus(StrEnum):
+    """Outcome of reserving one source request for a KST calendar day."""
+
+    RESERVED = "reserved"
+    ALREADY_RESERVED = "already_reserved"
+
+
+@dataclass(frozen=True, slots=True)
+class DailyRequestReservation:
+    """The result of an atomic source-level daily request reservation."""
+
+    status: DailyRequestReservationStatus
+    source_id: str
+    kst_date: date
+    reserved_at: datetime
 
 
 @dataclass(frozen=True, slots=True)

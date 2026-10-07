@@ -1,6 +1,8 @@
 """Local persistence boundaries for Phase 3 news collection."""
 
 from tech_pilot.storage.models import (
+    DailyRequestReservation,
+    DailyRequestReservationStatus,
     HttpValidators,
     NewsItem,
     StoredNewsItem,
@@ -10,6 +12,8 @@ from tech_pilot.storage.models import (
 from tech_pilot.storage.repository import SQLiteNewsRepository
 
 __all__ = [
+    "DailyRequestReservation",
+    "DailyRequestReservationStatus",
     "NewsItem",
     "HttpValidators",
     "SQLiteNewsRepository",
