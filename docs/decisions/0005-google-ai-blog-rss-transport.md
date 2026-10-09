@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-27
 - **Phase:** 3
-- **Purpose:** Google AI Blog RSS의 제한적 수동 수집에 적용할 HTTP 요청과 요청 제한의 경계를 제안한다.
+- **Purpose:** Google AI Blog RSS의 제한적 수동 수집에 적용하는 HTTP 요청과 요청 제한의 경계를 정의한다.
 - **Read when:** Google AI Blog RSS adapter, 출처별 요청 제한 또는 수동 `collect` 흐름을 구현·검토할 때
 - **Related documents:** [Google AI Blog RSS 출처](../sources/google-ai-blog-rss.md), [출처·근거 정책](../policies/source-and-evidence.md), [뉴스 수집 아키텍처](../architecture/news-collection.md), [뉴스 항목 계약](../specs/news-item.md), [0004: Hugging Face RSS 수집 전송](0004-hugging-face-rss-transport.md)
 
@@ -11,7 +11,7 @@
 
 Google AI Blog RSS는 2026-09-27에 사용자가 제한적 운영을 승인한 출처다. 승인 범위는 개인용 로컬 SQLite의 최소 메타데이터 보관과 하루 1회 이하의 수동 요청이며, 자동 재시도·backoff·scheduler·외부 제공은 포함하지 않는다.
 
-다만 출처 기록에는 실제 HTTP 전송 조건과 하루 1회 제한의 판정 방식이 정해져 있지 않다. 특히 관찰한 응답에는 `ETag`, `Last-Modified`, `RateLimit`, `Retry-After`가 없었으므로 Hugging Face RSS의 conditional HTTP 동작을 그대로 적용할 수 없다. 현재 수집 구현도 Hugging Face RSS만 지원한다.
+이 결정 작성 당시에는 실제 HTTP 전송 조건과 하루 1회 제한의 판정 방식이 정해져 있지 않았고, 수집 구현도 Hugging Face RSS만 지원했다. 관찰한 응답에는 `ETag`, `Last-Modified`, `RateLimit`, `Retry-After`가 없었으므로 Hugging Face RSS의 conditional HTTP 동작을 그대로 적용할 수 없었다.
 
 ## Facts and Constraints
 
@@ -57,4 +57,5 @@ Google AI Blog RSS는 2026-09-27에 사용자가 제한적 운영을 승인한 �
 - 장점: 제공자 요청 빈도 정보가 없는 상황에서도 수동·저빈도·최소 보관이라는 승인 범위를 코드로 검증할 수 있다.
 - 비용: 하루의 첫 요청이 실패해도 같은 KST 날짜에는 자동 또는 추가 수동 요청을 하지 못한다. 사용자는 다음 날 다시 실행해야 한다.
 - 비용: 자정 직전과 직후의 두 수동 요청은 시간상 가깝게 발생할 수 있다. 더 엄격한 간격이 필요해지면 rolling 24시간 정책을 별도 결정으로 검토한다.
-- 후속 작업: 이 결정에 따른 요청 예약 저장소는 별도 Issue에서 구현한다. 이후 adapter·fixture·출처별 제한 검사·수집 요약은 또 다른 구현 Issue에서 추가하며, 그 작업은 동시 실행에서 두 번째 실행이 HTTP 요청을 보내지 않는지와 실패한 출처가 다른 출처 수집을 막지 않는지도 검증한다.
+- 구현 상태: Issue #39에서 원자적 요청 예약 저장소를, Issue #41에서 Google 정규화 모듈·fetcher·수집 함수·synthetic fixture·수집 요약과 요청 제한 연결을 추가했다. mock HTTP 테스트에서 실패 후 예약 유지와 동시 실행 시 단일 요청을 검증했다.
+- 후속 작업: CLI 연결과 다중 출처 coordinator를 별도 Issue에서 추가한다. 이때 한 출처의 실패나 요청 제한 도달이 다른 출처의 수집을 막지 않는지 검증한다. 실제 Google 수집과 품질 검토는 아직 수행하지 않았다.

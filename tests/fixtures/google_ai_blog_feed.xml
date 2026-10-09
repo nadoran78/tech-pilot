@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>
+<title>Synthetic Google-like test feed</title><link>https://example.com/</link><description>Invented test data</description>
+<item><title>Synthetic release</title><link>https://example.com/release#details</link><guid isPermaLink="false">test-1</guid><pubDate>Fri, 09 Oct 2026 00:00:00 +0000</pubDate><atom:updated>2026-10-09T03:00:00Z</atom:updated><description>Must not be stored</description></item>
+<item><title>No publication date</title><link>https://example.com/no-date</link></item>
+<item><link>https://example.com/no-title</link></item>
+<item><title>Invalid URL</title><link>/relative</link></item>
+<item><title>Invalid time</title><link>https://example.com/bad-time</link><pubDate>not a timestamp</pubDate></item>
+</channel></rss>
