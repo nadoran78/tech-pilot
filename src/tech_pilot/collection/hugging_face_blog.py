@@ -8,6 +8,7 @@ from enum import StrEnum
 
 import httpx
 
+from tech_pilot.collection.models import CollectionStatus, CollectionSummary
 from tech_pilot.sources import SOURCE_ENDPOINT, SOURCE_ID, normalize_hugging_face_blog_feed
 from tech_pilot.storage import HttpValidators, SQLiteNewsRepository, StoreStatus
 
@@ -27,24 +28,6 @@ class FetchResult:
     http_status: int | None
     body: str | None
     validators: HttpValidators
-    error: str | None = None
-
-
-class CollectionStatus(StrEnum):
-    COMPLETED = "completed"
-    UNCHANGED = "unchanged"
-    FAILED = "failed"
-
-
-@dataclass(frozen=True, slots=True)
-class CollectionSummary:
-    source_id: str
-    status: CollectionStatus
-    http_status: int | None
-    inserted: int = 0
-    duplicates: int = 0
-    review_required: int = 0
-    skipped: int = 0
     error: str | None = None
 
 

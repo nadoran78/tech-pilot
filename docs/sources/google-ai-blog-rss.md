@@ -10,7 +10,7 @@
 
 | 항목 | 관찰·제안 값 | 근거와 한계 |
 |---|---|---|
-| `source_id` | `google-ai-blog` | Tech Pilot 내부에서 사용할 제안 식별자다. 아직 구현에 등록하지 않는다. |
+| `source_id` | `google-ai-blog` | Tech Pilot의 Google RSS 수집기가 사용하는 내부 식별자다. |
 | 운영 주체 | Google | [Google AI Blog](https://blog.google/innovation-and-ai/technology/ai/)의 RSS 링크가 [AI RSS endpoint](https://blog.google/innovation-and-ai/technology/ai/rss/)를 가리키는 것을 2026-09-27에 관찰했다. |
 | 접근 방식 | RSS | AI RSS endpoint는 익명 HTTP 200과 `application/xml; charset=utf-8`로 응답했다. |
 | 접근 endpoint | `https://blog.google/innovation-and-ai/technology/ai/rss/` | 이전 경로 `https://blog.google/technology/ai/rss/`는 이 endpoint로 HTTP 301 redirect됐다. endpoint의 지속성은 보장되지 않는다. |
@@ -36,7 +36,7 @@ AI 카테고리에는 Gemini, 연구, 개발자 도구 등 발표가 함께 포�
 
 - [robots.txt](https://blog.google/robots.txt)는 2026-09-27에 `search` 경로만 `Disallow`했다. AI RSS endpoint나 AI 카테고리 경로를 대상으로 하는 차단 규칙은 관찰하지 못했다. 이는 자동 접근·보관의 유일한 허가나 약관 동의가 아니다.
 - [Google Terms of Service](https://policies.google.com/terms)는 2026-07-30부터 효력이 있는 것으로 표시되며, 서비스의 machine-readable instructions를 위반해 콘텐츠에 자동 수단으로 접근하는 행위를 금지한다. 해당 약관은 RSS의 프로그램 수집 또는 최소 메타데이터 보관을 명시적으로 허용한다고 설명하지 않는다.
-- 관찰한 RSS 응답에는 인증 요구, `ETag`, `Last-Modified`, `RateLimit`, `Retry-After` header가 없었다. 따라서 조건부 요청·요청 간격·timeout·재시도 정책은 이 후보에 대해 아직 제안하지 않는다.
+- 관찰한 RSS 응답에는 인증 요구, `ETag`, `Last-Modified`, `RateLimit`, `Retry-After` header가 없었다. 프로젝트의 전송·요청 제한은 별도 [결정 기록 0005](../decisions/0005-google-ai-blog-rss-transport.md)를 따른다.
 - RSS endpoint가 AI 카테고리 페이지에서 제공되고 같은 `blog.google` 도메인의 원문을 가리키는 사실은 관찰됐다. 그러나 이 사실만으로 프로그램 수집·보관을 포괄적으로 허용하는 별도 근거가 되지는 않는다.
 
 ## Practical Access Assessment
@@ -56,7 +56,7 @@ AI 카테고리에는 Gemini, 연구, 개발자 도구 등 발표가 함께 포�
 
 사용자의 운영 승인은 제3자 약관이나 접근 조건을 대체하지 않으며, endpoint·robots·약관·추가 정책·응답 상태가 바뀌거나 보관·이용 범위를 넓히려면 수집을 중지하고 이 기록을 다시 검토한다. 이 PR은 출처 승인만 다루며, adapter·수동 수집·scheduler를 구현하거나 실행하지 않는다.
 
-구체적인 HTTP 전송 방식과 KST 기준의 하루 1회 제한은 [0005: Google AI Blog RSS 수동 수집 전송](../decisions/0005-google-ai-blog-rss-transport.md)에 `Accepted` 상태로 분리했다. adapter와 실제 수집은 요청 제한 저장소를 먼저 구현한 뒤 별도 Issue에서 추가한다.
+구체적인 HTTP 전송 방식과 KST 기준의 하루 1회 제한은 [0005: Google AI Blog RSS 수동 수집 전송](../decisions/0005-google-ai-blog-rss-transport.md)을 따른다. Issue #41에서 정규화 모듈과 수집 함수를 추가했다. 수집 함수는 HTTP 요청 전에 원자적 예약을 확보하고, 이미 예약된 날에는 `limit_reached`를 반환한다. 잘못된 개별 항목은 제외하고 정상 항목만 저장하며, XML 파싱 실패 때는 항목을 저장하지 않는다. CLI 연결과 다중 출처 실행은 후속 Issue에서 진행한다. 실제 Google 요청은 아직 실행하지 않았다.
 
 ## Follow-up
 
