@@ -12,10 +12,10 @@ import httpx
 
 from tech_pilot import __version__
 from tech_pilot.collection import (
+    CollectionStatus,
     CollectionSummary,
-    HuggingFaceBlogFetcher,
-    collect_hugging_face_blog,
 )
+from tech_pilot.collection.coordinator import SOURCE_IDS, collect_sources
 from tech_pilot.storage import SQLiteNewsRepository
 
 DEFAULT_DATABASE_PATH = Path("data/tech-pilot.sqlite3")
@@ -35,6 +35,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command")
     collect_parser = subparsers.add_parser("collect", help="승인된 RSS 출처를 한 번 수집합니다.")
+    collect_parser.add_argument(
+        "--source", choices=SOURCE_IDS, help="수집할 출처 (생략하면 모든 승인 출처)"
+    )
     collect_parser.add_argument(
         "--database",
         type=Path,
@@ -70,14 +73,14 @@ def main(argv: Sequence[str] | None = None, *, stdout: TextIO | None = None) -> 
         return 0
 
     with httpx.Client() as client:
-        summary = collect_hugging_face_blog(
+        summaries = collect_sources(
             SQLiteNewsRepository(args.database),
-            HuggingFaceBlogFetcher(client),
+            client,
+            source_ids=(args.source,) if args.source else SOURCE_IDS,
         )
-    _write_summary(output, summary)
-    if summary.status.value == "failed":
-        return 1
-    return 0
+    for summary in summaries:
+        _write_summary(output, summary)
+    return int(any(summary.status is CollectionStatus.FAILED for summary in summaries))
 
 
 def _list_news_items(output: TextIO, database_path: Path, limit: int) -> None:

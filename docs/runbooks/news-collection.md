@@ -1,18 +1,18 @@
 # 뉴스 수집 수동 운영
 
 - **Status:** Active
-- **Applies to:** 3단계의 승인된 Hugging Face Blog RSS 수동 수집
+- **Applies to:** 3단계의 승인된 Hugging Face 및 Google AI Blog RSS 수동 수집
 - **Purpose:** 로컬에서 RSS를 한 번 수집하고 저장된 항목과 수집 결과를 안전하게 점검하는 절차를 제공한다.
-- **Read when:** 실제 RSS 수집을 실행하거나 `completed`, `unchanged`, `failed` 결과를 해석할 때
+- **Read when:** 실제 RSS 수집을 실행하거나 출처별 결과와 일일 요청 제한을 해석할 때
 - **Related documents:** [3단계 문서](../phases/03-news-collection.md), [Hugging Face Blog RSS 출처](../sources/hugging-face-blog-rss.md), [0004: Hugging Face RSS 수집 전송](../decisions/0004-hugging-face-rss-transport.md), [뉴스 항목 계약](../specs/news-item.md)
 
 ## Scope and Preconditions
 
-이 runbook은 현재 승인된 `hugging-face-blog` 출처만 다룬다. 스케줄러, 자동 재시도, 다중 출처와 원문 전문 수집은 범위에 포함하지 않는다.
+이 runbook은 승인된 `hugging-face-blog`와 [Google AI Blog RSS](../sources/google-ai-blog-rss.md)의 순차 수동 수집을 다룬다. 스케줄러, 자동 재시도와 원문 전문 수집은 범위에 포함하지 않는다.
 
 수집 전에 다음을 확인한다.
 
-1. 현재 출처 기록의 endpoint, 접근 조건과 보관 범위를 [Hugging Face Blog RSS 출처](../sources/hugging-face-blog-rss.md)에서 확인한다.
+1. 선택한 출처의 endpoint, 접근 조건과 보관 범위를 각 출처 기록에서 확인한다.
 2. 최신 `robots.txt`, Terms of Service와 출처별 추가 정책을 확인해, 이전 기록 이후 접근 조건이 바뀌지 않았는지 점검한다. 출처 문서의 운영 승인 범위와 달리 인증·접근 제어가 필요해졌거나, 최소 수집을 직접 금지하거나 제공자 허가를 요구하는 조건을 발견하면 수집하지 않고 출처 기록을 재검토한다. robots 규칙은 약관이나 저작권 조건을 대체하지 않는다.
 3. 로컬 환경에서 의존성을 준비한다.
 
@@ -36,7 +36,14 @@ uv run tech-pilot collect
 uv run tech-pilot collect --database /path/to/news.sqlite3
 ```
 
-한 실행은 endpoint에 GET 요청을 한 번만 보낸다. 이는 [출처·근거 정책](../policies/source-and-evidence.md#practical-rss-access-approval)의 제한적 운영 승인 범위에 맞춘 저빈도 수동 요청이다. timeout, user-agent, 조건부 요청과 재시도 정책의 현재 제안은 [결정 기록 0004](../decisions/0004-hugging-face-rss-transport.md)를 기준으로 한다. 이 결정은 아직 `Proposed` 상태이므로, 운영 정책을 확정하거나 자동화하지 않는다.
+기본 실행은 Hugging Face와 Google을 순서대로 처리한다. 한 출처의 실패나 제한 도달 뒤에도 나머지 출처는 계속 실행한다. 하나만 수집하려면 다음 옵션을 사용한다.
+
+```bash
+uv run tech-pilot collect --source hugging-face-blog
+uv run tech-pilot collect --source google-ai-blog
+```
+
+각 출처에 GET 요청을 최대 한 번 보낸다. Hugging Face의 조건부 요청은 [결정 기록 0004](../decisions/0004-hugging-face-rss-transport.md)의 현재 구현을 유지하며, 이 결정은 여전히 `Proposed`다. Google은 승인된 [결정 기록 0005](../decisions/0005-google-ai-blog-rss-transport.md)에 따라 KST 달력 날짜별 한 번만 요청하고, 실패한 시도도 포함한다. 같은 날짜에 예약이 있으면 요청하지 않는다. 예약은 지정한 SQLite DB에 저장되므로 운영에는 같은 DB를 지속해서 사용한다. 별도 DB는 전역 요청 한도를 공유하지 않으며, DB 변경·삭제로 한도를 우회하지 않는다.
 
 ## Inspect Stored Items
 
@@ -60,9 +67,10 @@ uv run tech-pilot list --database /path/to/news.sqlite3 --limit 20
 |---|---:|---|---|
 | `completed` | 0 | HTTP 2xx 응답을 신뢰할 수 있게 파싱해 신규·중복·제외 수를 집계했다. | `list`로 원문 URL, 제목, 출처와 시각을 점검한다. |
 | `unchanged` | 0 | HTTP 304로 이전 validator 이후 feed 변경이 없었다. | 새 항목이 없다는 정상 결과다. 필요할 때 다음 수동 실행을 한다. |
+| `limit_reached` | 0 | Google의 같은 KST 날짜 요청 예약이 이미 있어 HTTP 요청을 보내지 않았다. | 다음 KST 날짜까지 기다린다. |
 | `failed` | 1 | HTTP 요청·상태 또는 RSS 파싱에 실패했다. | 오류 요약과 출처의 현재 endpoint·정책을 점검한 뒤, 필요할 때만 다시 한 번 실행한다. |
 
-`failed` 결과에서는 손상된 RSS 응답의 HTTP validator를 저장하지 않는다. 재시도·backoff는 아직 구현하지 않았으므로, 짧은 간격의 반복 요청은 하지 않는다.
+출처별로 요약 한 줄을 출력한다. 전체 종료 코드는 하나라도 `failed`이면 `1`, 그 외에는 `0`이다. 저장소 등 로컬 처리 오류도 안전한 실패 요약으로 표시하고 다음 출처를 실행한다. `failed` 결과에서는 손상된 RSS 응답의 HTTP validator를 저장하지 않는다. Google은 실패 뒤에도 당일 예약을 유지한다. 자동 재시도·backoff는 하지 않는다.
 
 ## Review the First Real Collection
 
@@ -70,8 +78,8 @@ uv run tech-pilot list --database /path/to/news.sqlite3 --limit 20
 
 1. 제목·원문 URL이 실제 AI 기술 발표를 판단하는 데 충분한지 확인한다.
 2. 발표 시각이 있는 항목과 없는 항목의 비율, feed의 항목 수와 불필요한 항목 비율을 확인한다.
-3. 원문 URL이 Hugging Face의 공식 원문을 가리키는지 표본으로 확인한다.
-4. `completed` 뒤 즉시 한 번 더 실행했을 때 `unchanged`가 나오면 조건부 요청 동작을 기록한다. endpoint가 새 응답을 내면 이를 실패로 해석하지 않는다.
+3. 원문 URL이 각 출처의 공식 원문을 가리키는지 표본으로 확인한다.
+4. Hugging Face 단독 실행에서 `unchanged`가 관찰되면 조건부 요청 동작을 기록한다. Google은 같은 날 재실행하면 `limit_reached`가 정상 결과다.
 5. 로컬 DB와 수집 출력에는 외부 콘텐츠가 포함될 수 있으므로 Git에 추가하거나 PR에 붙이지 않는다.
 
 이 검토 결과를 바탕으로 사용자만이 4단계 전환, 두 번째 출처 조사 또는 결정 기록 0004의 승인 여부를 결정한다.
