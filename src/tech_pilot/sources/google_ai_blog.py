@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 
 import feedparser  # type: ignore[import-untyped]
 
-from tech_pilot.sources.hugging_face_blog import RssNormalizationResult, SkippedRssEntry
+from tech_pilot.sources.models import RssNormalizationResult, SkippedRssEntry
 from tech_pilot.storage import NewsItem
 
 SOURCE_ID = "google-ai-blog"
