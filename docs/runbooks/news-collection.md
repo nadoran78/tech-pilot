@@ -80,7 +80,24 @@ uv run tech-pilot list --source google-ai-blog --collected-since 2026-10-10T05:0
 | `limit_reached` | 0 | Google의 같은 KST 날짜 요청 예약이 이미 있어 HTTP 요청을 보내지 않았다. | 다음 KST 날짜까지 기다린다. |
 | `failed` | 1 | HTTP 요청·상태 또는 RSS 파싱에 실패했다. | 오류 요약과 출처의 현재 endpoint·정책을 점검한 뒤, 필요할 때만 다시 한 번 실행한다. |
 
-출처별로 요약 한 줄을 출력한다. 전체 종료 코드는 하나라도 `failed`이면 `1`, 그 외에는 `0`이다. 저장소 등 로컬 처리 오류도 안전한 실패 요약으로 표시하고 다음 출처를 실행한다. `failed` 결과에서는 손상된 RSS 응답의 HTTP validator를 저장하지 않는다. Google은 실패 뒤에도 당일 예약을 유지한다. 자동 재시도·backoff는 하지 않는다.
+출처별로 요약 한 줄을 출력한다. 전체 종료 코드는 하나라도 `failed`이거나 이력 기록 오류가 있으면 `1`, 그 외에는 `0`이다. 저장소 등 로컬 처리 오류도 안전한 실패 요약으로 표시하고 다음 출처를 실행한다. `failed` 결과에서는 손상된 RSS 응답의 HTTP validator를 저장하지 않는다. Google은 실패 뒤에도 당일 예약을 유지한다. 자동 재시도·backoff는 하지 않는다.
+
+## Inspect Collection History
+
+출처별 실행 이력은 [결정 기록 0006](../decisions/0006-collection-run-history.md)에 따라 같은 DB에 보관한다. 뉴스 목록과 달리 신규 항목이 없는 실행도 확인할 수 있다.
+
+```bash
+uv run tech-pilot history --limit 20
+uv run tech-pilot history --source google-ai-blog --limit 10
+uv run tech-pilot history --database /path/to/news.sqlite3
+```
+
+시작 시각과 실행 ID 내림차순으로 조회한다. 시각은 UTC offset을 포함한다. 실패한 실행의 집계 `None`은 처리량 미확정이며 0개라는 뜻이 아니다. `완료 기록 없음: 진행 중 또는 중단 가능`은 종료 기록이 없다는 뜻으로, 요청 여부나 성공·실패를 확정하지 않는다.
+
+- `history_start_failed`: 시작 기록 실패로 해당 출처의 요청을 보내지 않았다. DB 접근·여유 공간을 점검한다.
+- `history_finish_failed`: 수집 결과와 별개로 종료 기록에 실패했다. 수집 요약과 뉴스 목록을 함께 점검하며, 기록을 완성하려고 재요청하지 않는다.
+
+두 경우 모두 다른 출처 처리는 계속한다. Google 당일 요청 예약과 이력은 독립적이므로 기록 실패를 이유로 DB 변경·삭제를 통해 한도를 우회하지 않는다. 기존 실행의 이력은 역으로 생성하지 않으며 자동 삭제·복구·정리 명령은 제공하지 않는다.
 
 ## Review the First Real Collection
 

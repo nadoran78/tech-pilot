@@ -21,3 +21,4 @@ class CollectionSummary:
     review_required: int = 0
     skipped: int = 0
     error: str | None = None
+    history_error: str | None = None
