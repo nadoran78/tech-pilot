@@ -74,6 +74,8 @@ uv run tech-pilot list --database /path/to/news.sqlite3 --limit 20
 
 ## Review the First Real Collection
 
+2026-10-10 실제 실행의 집계와 관찰 한계는 [첫 품질 검토 기록](2026-10-10-news-quality-review.md)에 있다. 이후 실행도 같은 기준으로 기록한다.
+
 첫 실제 수집에서는 다음을 확인하고 사용자와 결과를 검토한다.
 
 1. 제목·원문 URL이 실제 AI 기술 발표를 판단하는 데 충분한지 확인한다.

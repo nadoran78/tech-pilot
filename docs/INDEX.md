@@ -65,6 +65,7 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [뉴스 수집 수동 운영](runbooks/news-collection.md) | Active | 승인된 RSS 출처를 수동 수집·조회하고 결과를 점검하는 방법은 무엇인가? |
+| [2026-10-10 첫 수집 품질 검토](runbooks/2026-10-10-news-quality-review.md) | Draft | 첫 실제 다중 출처 수집의 결과·품질·한계와 다음 개선 후보는 무엇인가? |
 
 ## Decisions
 
