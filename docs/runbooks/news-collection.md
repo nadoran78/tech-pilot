@@ -59,9 +59,19 @@ uv run tech-pilot list --limit 20
 uv run tech-pilot list --database /path/to/news.sqlite3 --limit 20
 ```
 
-목록은 발표 시각이 있는 항목을 실제 시점 기준 내림차순으로 먼저 표시한다. 발표 시각이 같으면 수집 시각과 저장 ID 내림차순을 사용하며, 발표 시각이 없는 항목은 마지막에 표시한다. 현재 `list`는 품질 확인용 최소 인터페이스이며, 검색·필터링은 제공하지 않는다.
+목록은 발표 시각이 있는 항목을 실제 시점 기준 내림차순으로 먼저 표시한다. 발표 시각이 같으면 수집 시각과 저장 ID 내림차순을 사용하며, 발표 시각이 없는 항목은 마지막에 표시한다. `list`는 출처·최초 수집 시각 필터를 제공하며 제목 검색은 제공하지 않는다.
 
 ## Interpret the Result
+
+품질 검토용 조회는 다음 필터를 함께 사용할 수 있다. 필터 적용 뒤 기존 최신순 정렬과 `--limit`을 유지한다.
+
+```bash
+uv run tech-pilot list --source google-ai-blog --limit 20
+uv run tech-pilot list --collected-since 2026-10-10T14:00:00+09:00
+uv run tech-pilot list --source google-ai-blog --collected-since 2026-10-10T05:00:00Z
+```
+
+`--collected-since`는 timezone이 포함된 ISO 8601 시각을 받아 같은 실제 시점으로 비교하고 경계 시각을 포함한다. 최초 저장 시각을 기준으로 하므로 재관찰한 중복 항목은 이번 수집 결과 목록에 포함되지 않을 수 있다. 실행별 관찰 이력 기능은 아니다. 필터를 생략하면 기존 조회 동작을 유지한다.
 
 | 상태 | 종료 코드 | 의미 | 다음 행동 |
 |---|---:|---|---|

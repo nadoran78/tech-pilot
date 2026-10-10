@@ -112,18 +112,32 @@ class SQLiteNewsRepository:
         assert row is not None
         return int(row[0])
 
-    def list_recent(self, limit: int) -> tuple[StoredNewsItem, ...]:
+    def list_recent(
+        self, limit: int, *, source_id: str | None = None, collected_since: datetime | None = None
+    ) -> tuple[StoredNewsItem, ...]:
         """Return at most ``limit`` items ordered by published time, then collection time."""
 
         normalized_limit = _require_positive_limit(limit)
+        clauses: list[str] = []
+        parameters: list[str | int] = []
+        if source_id is not None:
+            clauses.append("source_id = ?")
+            parameters.append(_require_source_id(source_id))
+        if collected_since is not None:
+            since = _require_aware_datetime("collected_since", collected_since).astimezone(UTC)
+            clauses.append("julianday(collected_at) >= julianday(?)")
+            parameters.append(since.isoformat())
+        where = "WHERE " + " AND ".join(clauses) if clauses else ""
+        parameters.append(normalized_limit)
         with self._connect() as connection:
             apply_migrations(connection)
             rows = connection.execute(
-                """
+                f"""
                 SELECT id, source_id, external_id, canonical_url, title, published_at,
                        published_at_raw, collected_at, evidence_url, source_endpoint,
                        excerpt, raw_metadata_json
                 FROM news_items
+                {where}
                 ORDER BY
                     published_at IS NULL ASC,
                     julianday(published_at) DESC,
@@ -131,7 +145,7 @@ class SQLiteNewsRepository:
                     id DESC
                 LIMIT ?
                 """,
-                (normalized_limit,),
+                parameters,
             ).fetchall()
         return tuple(_stored_item_from_row(row) for row in rows)
 
