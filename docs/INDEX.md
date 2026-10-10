@@ -74,6 +74,7 @@
 | [0003: SQLite 뉴스 항목 저장](decisions/0003-sqlite-news-item-storage.md) | Accepted | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |
 | [0004: Hugging Face RSS 수집 전송](decisions/0004-hugging-face-rss-transport.md) | Proposed | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
 | [0005: Google AI Blog RSS 수동 수집 전송](decisions/0005-google-ai-blog-rss-transport.md) | Accepted | Google AI Blog RSS의 HTTP 요청과 KST 기준 일일 요청 제한을 어떻게 처리하는가? |
+| [0006: 수집 실행 이력과 보존 정책](decisions/0006-collection-run-history.md) | Proposed | 실행 결과·중단 상태를 어떻게 기록하고 보관하는가? |
 
 ## Phases
 
