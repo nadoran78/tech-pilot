@@ -142,7 +142,11 @@ def test_collect_command_returns_failure_for_a_safe_error(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     def fake_collect(
-        repository: SQLiteNewsRepository, client: httpx.Client, *, source_ids: tuple[str, ...]
+        repository: SQLiteNewsRepository,
+        client: httpx.Client,
+        *,
+        source_ids: tuple[str, ...],
+        history: object,
     ) -> tuple[CollectionSummary, ...]:
         assert repository is not None
         assert client is not None
@@ -171,7 +175,11 @@ def test_collect_command_prints_a_human_readable_summary(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     def fake_collect(
-        repository: SQLiteNewsRepository, client: httpx.Client, *, source_ids: tuple[str, ...]
+        repository: SQLiteNewsRepository,
+        client: httpx.Client,
+        *,
+        source_ids: tuple[str, ...],
+        history: object,
     ) -> tuple[CollectionSummary, ...]:
         assert repository is not None
         assert client is not None
