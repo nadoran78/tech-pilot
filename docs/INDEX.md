@@ -68,6 +68,8 @@
 
 ## Decisions
 
+첫 실제 다중 출처 수집 결과는 [2026-10-10 품질 검토](runbooks/2026-10-10-news-quality-review.md)에서 확인한다 (`Draft`).
+
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [0003: SQLite 뉴스 항목 저장](decisions/0003-sqlite-news-item-storage.md) | Accepted | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |

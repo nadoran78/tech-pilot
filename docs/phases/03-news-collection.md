@@ -45,7 +45,9 @@
 
 사용자가 2026-09-07에 이 설계를 승인했다. SQLite 뉴스 항목 저장·migration, 첫 Hugging Face Blog RSS 수동 수집, 기본 조회 CLI와 수동 운영 runbook은 각각 별도 Issue로 구현됐다. 이후 작업은 실제 수집 품질 검토 결과를 바탕으로 별도 Issue로 분리한다.
 
-Issue #41에서 Google AI Blog RSS 정규화·수동 수집 함수와 KST 일일 요청 예약 연결을 추가했다. Issue #43에서 두 출처의 순차 coordinator, CLI 출처 선택과 실패 격리를 추가했다. 실제 Google 수집 품질은 아직 검토하지 않았다.
+Issue #41에서 Google AI Blog RSS 정규화·수동 수집 함수와 KST 일일 요청 예약 연결을 추가했다. Issue #43에서 두 출처의 순차 coordinator, CLI 출처 선택과 실패 격리를 추가했다.
+
+Issue #45에서 [첫 실제 다중 출처 수집 품질 검토](../runbooks/2026-10-10-news-quality-review.md)를 수행했다. 현재 실제 수집 결과에 대한 사용자 품질 검토를 기다리며 활성 단계는 3단계를 유지한다.
 
 ## Non-Goals
 
