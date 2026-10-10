@@ -56,7 +56,11 @@ AI 카테고리에는 Gemini, 연구, 개발자 도구 등 발표가 함께 포�
 
 사용자의 운영 승인은 제3자 약관이나 접근 조건을 대체하지 않으며, endpoint·robots·약관·추가 정책·응답 상태가 바뀌거나 보관·이용 범위를 넓히려면 수집을 중지하고 이 기록을 다시 검토한다. 이 기록을 처음 추가한 PR #32는 출처 승인만 다뤘으며, 당시에는 adapter·수동 수집·scheduler를 구현하거나 실행하지 않았다.
 
-구체적인 HTTP 전송 방식과 KST 기준의 하루 1회 제한은 [0005: Google AI Blog RSS 수동 수집 전송](../decisions/0005-google-ai-blog-rss-transport.md)을 따른다. Issue #41에서 정규화 모듈과 수집 함수를 추가했다. 수집 함수는 HTTP 요청 전에 원자적 예약을 확보하고, 이미 예약된 날에는 `limit_reached`를 반환한다. 잘못된 개별 항목은 제외하고 정상 항목만 저장하며, XML 파싱 실패 때는 항목을 저장하지 않는다. CLI 연결과 다중 출처 실행은 후속 Issue에서 진행한다. 실제 Google 요청은 아직 실행하지 않았다.
+구체적인 HTTP 전송 방식과 KST 기준의 하루 1회 제한은 [0005: Google AI Blog RSS 수동 수집 전송](../decisions/0005-google-ai-blog-rss-transport.md)을 따른다. Issue #41에서 정규화 모듈과 수집 함수를 추가했다. 수집 함수는 HTTP 요청 전에 원자적 예약을 확보하고, 이미 예약된 날에는 `limit_reached`를 반환한다. 잘못된 개별 항목은 제외하고 정상 항목만 저장하며, XML 파싱 실패 때는 항목을 저장하지 않는다. 실제 Google 요청은 아직 실행하지 않았다.
+
+## CLI Integration
+
+Issue #43에서 CLI와 다중 출처 coordinator를 연결했다. `collect` 기본 실행은 Hugging Face와 Google을 순차 처리하며 `--source google-ai-blog`로 Google만 선택할 수 있다. 출처별 결과와 일일 제한의 해석은 [수동 운영 runbook](../runbooks/news-collection.md)을 따른다.
 
 ## Follow-up
 

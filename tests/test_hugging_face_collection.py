@@ -142,18 +142,20 @@ def test_collect_command_returns_failure_for_a_safe_error(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     def fake_collect(
-        repository: SQLiteNewsRepository, fetcher: HuggingFaceBlogFetcher
-    ) -> CollectionSummary:
+        repository: SQLiteNewsRepository, client: httpx.Client, *, source_ids: tuple[str, ...]
+    ) -> tuple[CollectionSummary, ...]:
         assert repository is not None
-        assert fetcher is not None
-        return CollectionSummary(
-            source_id=SOURCE_ID,
-            status=CollectionStatus.FAILED,
-            http_status=200,
-            error="RSS parsing failed",
+        assert client is not None
+        return (
+            CollectionSummary(
+                source_id=SOURCE_ID,
+                status=CollectionStatus.FAILED,
+                http_status=200,
+                error="RSS parsing failed",
+            ),
         )
 
-    monkeypatch.setattr(cli, "collect_hugging_face_blog", fake_collect)
+    monkeypatch.setattr(cli, "collect_sources", fake_collect)
     output = StringIO()
 
     exit_code = cli.main(
@@ -169,20 +171,22 @@ def test_collect_command_prints_a_human_readable_summary(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     def fake_collect(
-        repository: SQLiteNewsRepository, fetcher: HuggingFaceBlogFetcher
-    ) -> CollectionSummary:
+        repository: SQLiteNewsRepository, client: httpx.Client, *, source_ids: tuple[str, ...]
+    ) -> tuple[CollectionSummary, ...]:
         assert repository is not None
-        assert fetcher is not None
-        return CollectionSummary(
-            source_id=SOURCE_ID,
-            status=CollectionStatus.COMPLETED,
-            http_status=200,
-            inserted=2,
-            duplicates=1,
-            skipped=3,
+        assert client is not None
+        return (
+            CollectionSummary(
+                source_id=SOURCE_ID,
+                status=CollectionStatus.COMPLETED,
+                http_status=200,
+                inserted=2,
+                duplicates=1,
+                skipped=3,
+            ),
         )
 
-    monkeypatch.setattr(cli, "collect_hugging_face_blog", fake_collect)
+    monkeypatch.setattr(cli, "collect_sources", fake_collect)
     output = StringIO()
 
     exit_code = cli.main(
