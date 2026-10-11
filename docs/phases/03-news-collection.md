@@ -51,6 +51,8 @@ Issue #45에서 [첫 실제 다중 출처 수집 품질 검토](../runbooks/2026
 
 Issue #51에서 승인된 [결정 기록 0006](../decisions/0006-collection-run-history.md)에 따라 출처별 실행 이력 저장과 `history` 조회를 추가했다. 자동화와 보존 기간 설정은 별도 후속 범위다.
 
+Issue #53의 [실행 이력 운영 검증](../runbooks/2026-10-11-history-runtime-verification.md)에서 기존 DB migration, 실제 수집·이력·조회 일치와 데이터 보존을 확인했다. 정상 실행의 관찰 근거이며 품질 승인이나 단계 전환을 의미하지 않는다.
+
 ## Non-Goals
 
 - 사용자의 프로젝트와 학습 목표에 대한 영향 평가
