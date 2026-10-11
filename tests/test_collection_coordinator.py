@@ -68,12 +68,12 @@ def test_google_limit_does_not_prevent_hugging_face(tmp_path: Path) -> None:
 def test_storage_failure_is_safe_and_does_not_stop_next_source(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    import tech_pilot.collection.coordinator as coordinator
+    import tech_pilot.collection.registry as registry
 
     def fail(*args: object) -> None:
         raise sqlite3.OperationalError("private database path")
 
-    monkeypatch.setattr(coordinator, "collect_hugging_face_blog", fail)
+    monkeypatch.setattr(registry, "collect_hugging_face_blog", fail)
     with httpx.Client(
         transport=httpx.MockTransport(
             lambda request: httpx.Response(

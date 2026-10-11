@@ -6,30 +6,26 @@ from dataclasses import replace
 
 import httpx
 
-from tech_pilot.collection.google_ai_blog import GoogleAiBlogFetcher, collect_google_ai_blog
-from tech_pilot.collection.hugging_face_blog import (
-    HuggingFaceBlogFetcher,
-    collect_hugging_face_blog,
-)
 from tech_pilot.collection.models import CollectionStatus, CollectionSummary
+from tech_pilot.collection.registry import APPROVED_SOURCES, SourceRegistry
 from tech_pilot.storage import SQLiteNewsRepository
 from tech_pilot.storage.history import SQLiteRunHistory
-
-SOURCE_IDS = ("hugging-face-blog", "google-ai-blog")
 
 
 def collect_sources(
     repository: SQLiteNewsRepository,
     client: httpx.Client,
     *,
-    source_ids: Sequence[str] = SOURCE_IDS,
+    source_ids: Sequence[str] | None = None,
     history: SQLiteRunHistory,
+    registry: SourceRegistry = APPROVED_SOURCES,
 ) -> tuple[CollectionSummary, ...]:
     """Complete all selected sources, preserving each source's request policy."""
-    if any(source not in SOURCE_IDS for source in source_ids):
-        raise ValueError("unknown source")
+    selected = tuple(dict.fromkeys(registry.source_ids if source_ids is None else source_ids))
+    # Resolve the entire selection before any history or HTTP side effect.
+    collectors = tuple((source, registry.collector(source)) for source in selected)
     results: list[CollectionSummary] = []
-    for source in dict.fromkeys(source_ids):
+    for source, collect in collectors:
         try:
             run_id = history.start(source)
         except (sqlite3.Error, OSError, ValueError):
@@ -40,10 +36,9 @@ def collect_sources(
             )
             continue
         try:
-            if source == "hugging-face-blog":
-                result = collect_hugging_face_blog(repository, HuggingFaceBlogFetcher(client))
-            else:
-                result = collect_google_ai_blog(repository, GoogleAiBlogFetcher(client))
+            result = collect(repository, client)
+            if result.source_id != source:
+                raise ValueError("collector source_id mismatch")
         except (sqlite3.Error, OSError, ValueError):
             result = CollectionSummary(
                 source, CollectionStatus.FAILED, None, error="Source collection failed"

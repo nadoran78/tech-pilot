@@ -51,6 +51,21 @@ CLI collect command
 
 요청 시 timeout, `ETag`와 `Last-Modified`의 사용 여부는 출처별 설정으로 남긴다. 응답이 validator를 제공하면 이후 요청에서 조건부 요청을 사용할 수 있으며, 304 응답은 새 항목을 만들지 않는다. 이 원칙은 HTTP의 validator·조건부 요청 의미를 따른다. [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)
 
+## Source Registry Implementation
+
+Issue #57에서는 [registry](../../src/tech_pilot/collection/registry.py)에 승인된 출처 ID와 `(SQLiteNewsRepository, httpx.Client) -> CollectionSummary` callable을 등록한다. 목록은 구성 시 검증한 순서 있는 스냅샷이며 중복·빈 ID를 거부한다. 실행 중 전역 등록 목록을 변경하거나 설정 파일·동적 plugin을 로드하지 않는다.
+
+출처를 추가할 때는 다음 순서로 진행한다.
+
+1. [출처·근거 정책](../policies/source-and-evidence.md)에 따라 운영 승인을 받는다. 코드 등록 자체는 승인이 아니다.
+2. 전용 정규화·수집 모듈과 네트워크 없는 테스트를 만든다. 요청 제한·timeout·validator 정책은 해당 수집기에 둔다.
+3. 공통 호출 형태로 연결하는 wrapper와 운영 registry 항목을 추가한다. 결과의 source_id는 등록 ID와 일치해야 한다.
+4. coordinator·CLI에 출처별 분기를 추가하지 않고 실행·이력·실패 격리와 기존 출처 회귀를 검증한다.
+
+coordinator는 전체 선택을 부작용 전에 검증하고 registry callable을 순차 호출한다. 선택 중복은 최초 선택 순서를 유지해 제거한다. CLI 허용 목록과 기본 실행 순서는 운영 registry에서 도출한다. 테스트는 별도 registry를 주입하며 운영 CLI에 가짜 출처를 노출하지 않는다. 결과 ID 불일치는 안전한 로컬 실패로 처리한다.
+
+공통 실패·이력 규칙은 기존 계약을 유지한다. [registry 테스트](../../tests/test_source_registry.py)는 가짜 출처의 성공·실패·잘못된 결과 ID, 등록·선택 검증과 CLI 목록 도출을 확인한다. 실제 새 출처 승인·수집을 수행한 근거는 아니다. PR #56의 종합 판단 갱신은 이 구현의 검증·병합 뒤 별도 작업으로 진행한다.
+
 ## Failure and Evidence Boundaries
 
 - 한 출처의 접근·파싱 실패는 수집 실행 결과에 기록하고 다른 출처의 처리를 계속한다.
