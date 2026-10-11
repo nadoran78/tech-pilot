@@ -84,6 +84,7 @@
 | [1단계: 프로젝트 문서 골격 구성](phases/01-project-foundation.md) | Accepted | 문서 구조와 Codex 작업 경로 |
 | [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md) | Accepted | 기술 스택 결정과 근거 |
 | [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md) | Active | 신뢰 가능한 뉴스 수집 기반 |
+| [3단계 완료·품질 종합 검토](phases/03-news-collection-review.md) | Draft | 완료 조건의 근거·한계와 사용자 결정 항목 |
 
 4단계 이후의 상세 단계 문서는 해당 단계가 가까워졌을 때 만든다. 전체 방향은 [제품 로드맵](product/roadmap.md)에서 관리한다.
 
