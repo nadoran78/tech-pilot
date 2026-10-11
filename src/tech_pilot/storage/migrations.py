@@ -75,6 +75,29 @@ MIGRATIONS = (
             """,
         ),
     ),
+    Migration(
+        version=4,
+        name="create_collection_runs",
+        statements=(
+            """
+            CREATE TABLE collection_runs (
+                run_id INTEGER PRIMARY KEY,
+                source_id TEXT NOT NULL,
+                started_at TEXT NOT NULL,
+                finished_at TEXT,
+                status TEXT NOT NULL CHECK(status IN
+                    ('running','completed','unchanged','failed','limit_reached')),
+                http_status INTEGER,
+                inserted INTEGER CHECK(inserted >= 0),
+                duplicates INTEGER CHECK(duplicates >= 0),
+                review_required INTEGER CHECK(review_required >= 0),
+                skipped INTEGER CHECK(skipped >= 0),
+                error_code TEXT CHECK(error_code IN
+                    ('request_failed','http_failed','parse_failed','local_failed'))
+            )
+            """,
+        ),
+    ),
 )
 
 

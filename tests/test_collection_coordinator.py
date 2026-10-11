@@ -10,6 +10,7 @@ from tech_pilot import cli
 from tech_pilot.collection import CollectionStatus
 from tech_pilot.collection.coordinator import collect_sources
 from tech_pilot.storage import SQLiteNewsRepository
+from tech_pilot.storage.history import SQLiteRunHistory
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -29,7 +30,11 @@ def test_sources_continue_after_http_failure(tmp_path: Path, failed_host: str | 
         return httpx.Response(200, text=(FIXTURES / fixture).read_text())
 
     with httpx.Client(transport=httpx.MockTransport(respond)) as client:
-        results = collect_sources(SQLiteNewsRepository(tmp_path / "news.sqlite3"), client)
+        results = collect_sources(
+            SQLiteNewsRepository(tmp_path / "news.sqlite3"),
+            client,
+            history=SQLiteRunHistory(tmp_path / "news.sqlite3"),
+        )
     assert hosts == ["huggingface.co", "blog.google"]
     assert [result.status for result in results] == [
         CollectionStatus.FAILED if failed_host == host else CollectionStatus.COMPLETED
@@ -48,7 +53,10 @@ def test_google_limit_does_not_prevent_hugging_face(tmp_path: Path) -> None:
 
     with httpx.Client(transport=httpx.MockTransport(respond)) as client:
         results = collect_sources(
-            repository, client, source_ids=("google-ai-blog", "hugging-face-blog")
+            repository,
+            client,
+            source_ids=("google-ai-blog", "hugging-face-blog"),
+            history=SQLiteRunHistory(tmp_path / "news.sqlite3"),
         )
     assert hosts == ["huggingface.co"]
     assert [result.status for result in results] == [
@@ -73,7 +81,11 @@ def test_storage_failure_is_safe_and_does_not_stop_next_source(
             )
         )
     ) as client:
-        results = collect_sources(SQLiteNewsRepository(tmp_path / "news.sqlite3"), client)
+        results = collect_sources(
+            SQLiteNewsRepository(tmp_path / "news.sqlite3"),
+            client,
+            history=SQLiteRunHistory(tmp_path / "news.sqlite3"),
+        )
     assert results[0].status is CollectionStatus.FAILED
     assert results[0].error == "Source collection failed"
     assert results[1].status is CollectionStatus.COMPLETED

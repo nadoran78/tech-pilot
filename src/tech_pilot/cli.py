@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sqlite3
 import sys
 from collections.abc import Sequence
 from datetime import UTC, datetime
@@ -18,6 +19,7 @@ from tech_pilot.collection import (
 )
 from tech_pilot.collection.coordinator import SOURCE_IDS, collect_sources
 from tech_pilot.storage import SQLiteNewsRepository
+from tech_pilot.storage.history import SQLiteRunHistory
 
 DEFAULT_DATABASE_PATH = Path("data/tech-pilot.sqlite3")
 DEFAULT_LIST_LIMIT = 20
@@ -64,6 +66,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_LIST_LIMIT,
         help=f"표시할 최대 항목 수 (기본값: {DEFAULT_LIST_LIMIT})",
     )
+    history_parser = subparsers.add_parser("history", help="출처별 수집 실행 이력을 조회합니다.")
+    history_parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE_PATH)
+    history_parser.add_argument("--source", choices=SOURCE_IDS)
+    history_parser.add_argument("--limit", type=_positive_int, default=20)
     return parser
 
 
@@ -75,6 +81,31 @@ def main(argv: Sequence[str] | None = None, *, stdout: TextIO | None = None) -> 
         return 0
 
     output = stdout if stdout is not None else sys.stdout
+    if args.command == "history":
+        try:
+            runs = (
+                SQLiteRunHistory(args.database).list_runs(args.limit, source_id=args.source)
+                if args.database.exists()
+                else ()
+            )
+        except (sqlite3.Error, OSError, ValueError):
+            print("수집 실행 이력 조회 실패: history_read_failed", file=output)
+            return 1
+        if not runs:
+            print("수집 실행 이력이 없습니다.", file=output)
+        for run in runs:
+            note = (
+                "완료 기록 없음: 진행 중 또는 중단 가능" if run.status == "running" else run.status
+            )
+            print(
+                f"실행 #{run.run_id}: 출처={run.source_id}, 상태={note}, "
+                f"시작={run.started_at.isoformat()}, "
+                f"종료={run.finished_at.isoformat() if run.finished_at else '-'}, "
+                f"HTTP={run.http_status}, 신규={run.inserted}, 중복={run.duplicates}, "
+                f"검토필요={run.review_required}, 제외={run.skipped}, 오류코드={run.error_code}",
+                file=output,
+            )
+        return 0
     if args.command == "list":
         _list_news_items(
             output,
@@ -90,10 +121,16 @@ def main(argv: Sequence[str] | None = None, *, stdout: TextIO | None = None) -> 
             SQLiteNewsRepository(args.database),
             client,
             source_ids=(args.source,) if args.source else SOURCE_IDS,
+            history=SQLiteRunHistory(args.database),
         )
     for summary in summaries:
         _write_summary(output, summary)
-    return int(any(summary.status is CollectionStatus.FAILED for summary in summaries))
+    return int(
+        any(
+            summary.status is CollectionStatus.FAILED or summary.history_error
+            for summary in summaries
+        )
+    )
 
 
 def _list_news_items(
@@ -140,6 +177,8 @@ def _write_summary(output: TextIO, summary: CollectionSummary) -> None:
     ]
     if summary.error is not None:
         fields.append(f"오류={summary.error}")
+    if summary.history_error is not None:
+        fields.append(f"이력오류={summary.history_error}")
     print("수집 결과: " + ", ".join(fields), file=output)
 
 
