@@ -147,6 +147,7 @@ def test_collect_command_returns_failure_for_a_safe_error(
         *,
         source_ids: tuple[str, ...],
         history: object,
+        registry: object,
     ) -> tuple[CollectionSummary, ...]:
         assert repository is not None
         assert client is not None
@@ -180,6 +181,7 @@ def test_collect_command_prints_a_human_readable_summary(
         *,
         source_ids: tuple[str, ...],
         history: object,
+        registry: object,
     ) -> tuple[CollectionSummary, ...]:
         assert repository is not None
         assert client is not None
