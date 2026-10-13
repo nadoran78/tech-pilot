@@ -210,7 +210,7 @@ def test_history_failure_isolated_without_retries(
 def test_failure_codes_do_not_store_sensitive_details(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mode: str, code: str
 ) -> None:
-    import tech_pilot.collection.coordinator as coordinator
+    import tech_pilot.collection.registry as registry
 
     database = tmp_path / "news.sqlite3"
     history = SQLiteRunHistory(database)
@@ -225,7 +225,7 @@ def test_failure_codes_do_not_store_sensitive_details(
         def fail(*args: object) -> None:
             raise sqlite3.OperationalError("SECRET")
 
-        monkeypatch.setattr(coordinator, "collect_hugging_face_blog", fail)
+        monkeypatch.setattr(registry, "collect_hugging_face_blog", fail)
     with httpx.Client(transport=httpx.MockTransport(respond)) as client:
         results = collect_sources(
             SQLiteNewsRepository(database),

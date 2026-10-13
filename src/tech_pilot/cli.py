@@ -17,7 +17,8 @@ from tech_pilot.collection import (
     CollectionStatus,
     CollectionSummary,
 )
-from tech_pilot.collection.coordinator import SOURCE_IDS, collect_sources
+from tech_pilot.collection.coordinator import collect_sources
+from tech_pilot.collection.registry import APPROVED_SOURCES
 from tech_pilot.storage import SQLiteNewsRepository
 from tech_pilot.storage.history import SQLiteRunHistory
 
@@ -27,6 +28,7 @@ DEFAULT_LIST_LIMIT = 20
 
 def build_parser() -> argparse.ArgumentParser:
     """Build the command-line parser for manual news collection."""
+    source_ids = APPROVED_SOURCES.source_ids
     parser = argparse.ArgumentParser(
         prog="tech-pilot",
         description="Prepare Tech Pilot commands for AI technology news collection.",
@@ -39,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
     collect_parser = subparsers.add_parser("collect", help="승인된 RSS 출처를 한 번 수집합니다.")
     collect_parser.add_argument(
-        "--source", choices=SOURCE_IDS, help="수집할 출처 (생략하면 모든 승인 출처)"
+        "--source", choices=source_ids, help="수집할 출처 (생략하면 모든 승인 출처)"
     )
     collect_parser.add_argument(
         "--database",
@@ -48,7 +50,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="SQLite 데이터베이스 경로 (기본값: data/tech-pilot.sqlite3)",
     )
     list_parser = subparsers.add_parser("list", help="저장된 뉴스 항목을 최신순으로 조회합니다.")
-    list_parser.add_argument("--source", choices=SOURCE_IDS, help="조회할 출처")
+    list_parser.add_argument("--source", choices=source_ids, help="조회할 출처")
     list_parser.add_argument(
         "--collected-since",
         type=_aware_timestamp,
@@ -68,7 +70,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     history_parser = subparsers.add_parser("history", help="출처별 수집 실행 이력을 조회합니다.")
     history_parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE_PATH)
-    history_parser.add_argument("--source", choices=SOURCE_IDS)
+    history_parser.add_argument("--source", choices=source_ids)
     history_parser.add_argument("--limit", type=_positive_int, default=20)
     return parser
 
@@ -120,8 +122,9 @@ def main(argv: Sequence[str] | None = None, *, stdout: TextIO | None = None) -> 
         summaries = collect_sources(
             SQLiteNewsRepository(args.database),
             client,
-            source_ids=(args.source,) if args.source else SOURCE_IDS,
+            source_ids=(args.source,) if args.source else APPROVED_SOURCES.source_ids,
             history=SQLiteRunHistory(args.database),
+            registry=APPROVED_SOURCES,
         )
     for summary in summaries:
         _write_summary(output, summary)
