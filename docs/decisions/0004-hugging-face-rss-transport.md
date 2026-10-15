@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-09
 - **Phase:** 3
-- **Purpose:** 첫 수동 RSS 수집의 HTTP 요청·validator·로컬 DB 기본 경계를 제안한다.
+- **Purpose:** 첫 수동 RSS 수집의 HTTP 요청·validator·로컬 DB 기본 경계를 정의한다.
 - **Read when:** Hugging Face RSS 요청, 조건부 수집 또는 `collect` CLI를 구현·검토할 때
 - **Related documents:** [Hugging Face Blog RSS 출처](../sources/hugging-face-blog-rss.md), [뉴스 수집 아키텍처](../architecture/news-collection.md), [0003: SQLite 뉴스 항목 저장](0003-sqlite-news-item-storage.md)
 
