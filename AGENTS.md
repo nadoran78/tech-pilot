@@ -10,9 +10,9 @@
 
 ## Current Phase
 
-현재 활성 단계는 **3단계: AI 기술 뉴스 수집 및 보관**이다.
+현재 활성 단계는 **4단계: 요약·분류 및 의미 기반 통합**이다.
 
-- 현재 범위와 완료 조건: [3단계 문서](docs/phases/03-news-collection.md)
+- 현재 범위와 완료 조건: [4단계 문서](docs/phases/04-news-understanding.md)
 - 전체 단계와 전환 원칙: [제품 로드맵](docs/product/roadmap.md)
 - 전체 문서 목록: [문서 인덱스](docs/INDEX.md)
 
@@ -34,6 +34,7 @@
 - Issue, 브랜치, PR 또는 병합 작업: [개발 워크플로](docs/process/development-workflow.md)
 - 기술 스택 검토: [2단계 문서](docs/phases/02-tech-stack-selection.md), [결정 기록 안내](docs/decisions/README.md)
 - 뉴스 수집 설계: [3단계 문서](docs/phases/03-news-collection.md)
+- 뉴스 요약·분류 설계: [4단계 문서](docs/phases/04-news-understanding.md)
 
 ## Working Rules
 

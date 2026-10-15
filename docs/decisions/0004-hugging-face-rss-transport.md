@@ -1,6 +1,6 @@
 # 0004: Hugging Face RSS Collection Transport
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-09-09
 - **Phase:** 3
 - **Purpose:** 첫 수동 RSS 수집의 HTTP 요청·validator·로컬 DB 기본 경계를 제안한다.
@@ -9,7 +9,7 @@
 
 ## Context
 
-2026-09-09 초기 제안 당시에는 RSS parser와 뉴스 저장소가 독립적으로 검증됐지만, 실제 수동 수집의 HTTP 경계는 정해지지 않았다. 이후 수동 수집·다중 출처·registry·실행 이력이 구현됐다. 2026-10-15 Issue #59에서 develop `491a0a5`의 구현과 이 문서를 대조했다. 이는 설명의 정합성 정리이며 전송 정책 변경이나 ADR 승인이 아니다. 사용자 명시적 승인 전까지 Proposed를 유지한다.
+2026-09-09 초기 제안 당시에는 RSS parser와 뉴스 저장소가 독립적으로 검증됐지만, 실제 수동 수집의 HTTP 경계는 정해지지 않았다. 이후 수동 수집·다중 출처·registry·실행 이력이 구현됐다. 2026-10-15 Issue #59에서 develop `491a0a5`의 구현과 이 문서를 대조했다. 당시 작업은 설명의 정합성 정리였으며 승인을 의미하지 않았다. 이후 같은 날 사용자가 정리된 전송 정책을 명시적으로 승인하여 Issue #61에서 Accepted로 반영했다. 자동화나 접근 승인 범위를 확대하지 않는다.
 
 ## Decision
 
@@ -45,4 +45,4 @@
 - 일반 CLI는 coordinator를 거치므로 304에서도 [ADR 0006](0006-collection-run-history.md)에 따라 시작·완료 이력을 기록한다. [이력 테스트](../../tests/test_collection_history.py)에서 상태 전이와 기록 오류를 검증한다. 출처 수집 함수를 직접 호출하는 것만으로 실행 이력이 생기지는 않는다.
 - [2026-10-11 운영 검증](../runbooks/2026-10-11-history-runtime-verification.md)에서는 실제 304, 뉴스 미추가, validator 값 유지·확인 시각 갱신과 완료 이력을 관찰했다. 한 시점의 결과로 장기 응답·모든 validator 조합·장애 처리를 보장하지 않는다.
 
-Issue #59는 코드·정책·접근 승인 범위를 변경하지 않고 설명과 근거를 정리했다. 이 문서의 Proposed 승인 여부, [종합 검토](../phases/03-news-collection-review.md)의 품질 판단 및 4단계 전환은 각각 별도의 사용자 결정이다.
+Issue #59는 코드·정책·접근 승인 범위를 변경하지 않고 설명과 근거를 정리했다. 이후 사용자가 2026-10-15에 이 문서와 [종합 검토](../phases/03-news-collection-review.md), 3단계 완료·4단계 전환을 명시적으로 승인했다. 승인으로 기존 미검증 범위가 실제 검증된 것은 아니며 전송 구현도 변경하지 않았다.

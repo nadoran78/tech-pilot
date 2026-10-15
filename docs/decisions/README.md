@@ -72,6 +72,6 @@ docs/decisions/0001-short-decision-title.md
 | [0001: 뉴스 수집 MVP 기술 스택](0001-news-collection-mvp-tech-stack.md) | Accepted | MVP의 기술 기반과 의도적으로 보류한 항목은 무엇인가? |
 | [0002: Python 3.13 초기화 런타임](0002-python-3-13-bootstrap-runtime.md) | Accepted | 초기 개발 환경을 어떤 Python 마이너 버전으로 재현하는가? |
 | [0003: SQLite 뉴스 항목 저장](0003-sqlite-news-item-storage.md) | Accepted | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |
-| [0004: Hugging Face RSS 수집 전송](0004-hugging-face-rss-transport.md) | Proposed | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
+| [0004: Hugging Face RSS 수집 전송](0004-hugging-face-rss-transport.md) | Accepted | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
 | [0005: Google AI Blog RSS 수동 수집 전송](0005-google-ai-blog-rss-transport.md) | Accepted | Google AI Blog RSS의 HTTP 요청과 KST 기준 일일 요청 제한을 어떻게 처리하는가? |
 | [0006: 수집 실행 이력과 보존 정책](0006-collection-run-history.md) | Accepted | 실행 결과·중단 상태를 어떻게 기록하고 보관하는가? |

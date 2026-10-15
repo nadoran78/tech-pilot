@@ -1,6 +1,6 @@
 # Phase 3: AI Technology News Collection
 
-- **Status:** Active
+- **Status:** Accepted
 - **Applies to:** Phase 3
 - **Purpose:** 신규 AI 기술 발표를 발견하고 원본 근거와 함께 축적하는 단계의 경계를 정의한다.
 - **Read when:** 뉴스 수집 요구사항, 설계와 구현 작업을 시작하거나 검토할 때
@@ -47,7 +47,7 @@
 
 Issue #41에서 Google AI Blog RSS 정규화·수동 수집 함수와 KST 일일 요청 예약 연결을 추가했다. Issue #43에서 두 출처의 순차 coordinator, CLI 출처 선택과 실패 격리를 추가했다.
 
-Issue #45에서 [첫 실제 다중 출처 수집 품질 검토](../runbooks/2026-10-10-news-quality-review.md)를 수행했다. 현재 실제 수집 결과에 대한 사용자 품질 검토를 기다리며 활성 단계는 3단계를 유지한다.
+Issue #45에서 [첫 실제 다중 출처 수집 품질 검토](../runbooks/2026-10-10-news-quality-review.md)를 수행했다. 사용자는 2026-10-15에 품질·운영 검토의 한계를 수용하고 이 단계의 완료와 [4단계 전환](04-news-understanding.md)을 명시적으로 승인했다. 단계 완료는 저빈도 수동 두 출처 범위이며 무인 운영이나 모든 발표의 수집을 보장하지 않는다.
 
 Issue #51에서 승인된 [결정 기록 0006](../decisions/0006-collection-run-history.md)에 따라 출처별 실행 이력 저장과 `history` 조회를 추가했다. 자동화와 보존 기간 설정은 별도 후속 범위다.
 
@@ -73,7 +73,7 @@ Issue #53의 [실행 이력 운영 검증](../runbooks/2026-10-11-history-runtim
 
 ## Exit Criteria
 
-현재 근거와 미결정 항목은 [완료 조건·품질 종합 검토](03-news-collection-review.md)에서 확인한다. 검토 문서와 관련 PR의 병합은 단계 전환 승인이 아니다.
+완료 근거와 수용한 한계는 [완료 조건·품질 종합 검토](03-news-collection-review.md)에서 확인한다. Issue #61에서 사용자의 2026-10-15 명시적 승인을 반영했다. PR 병합에서 승인을 추정한 것이 아니다. 아래는 완료 판단에 사용한 조건이며 문서 상태 Accepted는 이 단계의 합의·완료를 뜻한다.
 
 - 설정된 초기 출처에서 신규 항목을 반복적으로 수집할 수 있다.
 - 같은 항목의 재수집이 기본적인 중복 레코드를 만들지 않는다.

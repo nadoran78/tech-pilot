@@ -4,11 +4,11 @@ Tech Pilot은 새롭게 등장하는 AI 기술을 지속적으로 파악하고, 
 
 ## Current Status
 
-현재는 **3단계: AI 기술 뉴스 수집 및 보관**을 진행하고 있다. 뉴스 수집 MVP의 기술 스택과 Python 프로젝트 골격은 승인됐으며, 이제 신뢰 가능한 출처에서 반복 수집·보관할 설계를 진행한다. 수집 기능은 별도 Issue에서 구현한다.
+현재는 **4단계: 요약·분류 및 의미 기반 통합**을 진행하고 있다. 사용자가 2026-10-15에 3단계의 수동 수집 기반과 검증 한계를 수용하고 단계 전환을 승인했다. 이제 저장된 소량 뉴스의 요약·분류 최소 범위를 설계한다. 세부 입력·모델·비용·저장 계약은 아직 미결정이며 유료 API·자동화·블로그 작성은 별도 승인 대상이다.
 
 - 프로젝트의 배경과 목표: [제품 비전](docs/product/vision.md)
 - 전체 개발 단계: [제품 로드맵](docs/product/roadmap.md)
-- 현재 단계의 범위: [3단계 문서](docs/phases/03-news-collection.md)
+- 현재 단계의 범위: [4단계 문서](docs/phases/04-news-understanding.md)
 - 전체 문서 지도: [문서 인덱스](docs/INDEX.md)
 
 ## For Contributors and Codex

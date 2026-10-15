@@ -8,12 +8,12 @@
 
 ## Current Phase
 
-현재 활성 단계는 **3단계: AI 기술 뉴스 수집 및 보관**이다.
+현재 활성 단계는 **4단계: 요약·분류 및 의미 기반 통합**이다.
 
 현재 작업에서는 다음 순서로 읽는다.
 
 1. [AGENTS.md](../AGENTS.md)
-2. [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md)
+2. [4단계: 요약·분류 및 의미 기반 통합](phases/04-news-understanding.md)
 3. 작업과 직접 관련된 문서
 
 단계 전환은 완료 조건을 검토한 뒤 사용자가 명시적으로 결정한다.
@@ -65,15 +65,15 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [뉴스 수집 수동 운영](runbooks/news-collection.md) | Active | 승인된 RSS 출처를 수동 수집·조회하고 결과를 점검하는 방법은 무엇인가? |
-| [2026-10-10 첫 수집 품질 검토](runbooks/2026-10-10-news-quality-review.md) | Draft | 첫 실제 다중 출처 수집의 결과·품질·한계와 다음 개선 후보는 무엇인가? |
-| [2026-10-11 실행 이력 운영 검증](runbooks/2026-10-11-history-runtime-verification.md) | Draft | 실제 수집 결과와 실행 이력·조회는 일치하며 기존 DB는 보존되는가? |
+| [2026-10-10 첫 수집 품질 검토](runbooks/2026-10-10-news-quality-review.md) | Accepted | 첫 실제 다중 출처 수집의 결과·품질·한계와 다음 개선 후보는 무엇인가? |
+| [2026-10-11 실행 이력 운영 검증](runbooks/2026-10-11-history-runtime-verification.md) | Accepted | 실제 수집 결과와 실행 이력·조회는 일치하며 기존 DB는 보존되는가? |
 
 ## Decisions
 
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [0003: SQLite 뉴스 항목 저장](decisions/0003-sqlite-news-item-storage.md) | Accepted | 뉴스 항목 계약을 SQLite에 어떻게 보관하고 기술적 중복을 판정하는가? |
-| [0004: Hugging Face RSS 수집 전송](decisions/0004-hugging-face-rss-transport.md) | Proposed | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
+| [0004: Hugging Face RSS 수집 전송](decisions/0004-hugging-face-rss-transport.md) | Accepted | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
 | [0005: Google AI Blog RSS 수동 수집 전송](decisions/0005-google-ai-blog-rss-transport.md) | Accepted | Google AI Blog RSS의 HTTP 요청과 KST 기준 일일 요청 제한을 어떻게 처리하는가? |
 | [0006: 수집 실행 이력과 보존 정책](decisions/0006-collection-run-history.md) | Accepted | 실행 결과·중단 상태를 어떻게 기록하고 보관하는가? |
 
@@ -83,10 +83,11 @@
 |---|---|---|
 | [1단계: 프로젝트 문서 골격 구성](phases/01-project-foundation.md) | Accepted | 문서 구조와 Codex 작업 경로 |
 | [2단계: 기술 스택 선정](phases/02-tech-stack-selection.md) | Accepted | 기술 스택 결정과 근거 |
-| [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md) | Active | 신뢰 가능한 뉴스 수집 기반 |
-| [3단계 완료·품질 종합 검토](phases/03-news-collection-review.md) | Draft | 완료 조건의 근거·한계와 사용자 결정 항목 |
+| [3단계: AI 기술 뉴스 수집](phases/03-news-collection.md) | Accepted | 완료: 신뢰 가능한 수동 뉴스 수집 기반 |
+| [3단계 완료·품질 종합 검토](phases/03-news-collection-review.md) | Accepted | 완료 조건의 근거·한계와 사용자 승인 기록 |
+| [4단계: 요약·분류 및 의미 기반 통합](phases/04-news-understanding.md) | Active | 소량 뉴스 이해·평가 경로의 첫 설계 범위 |
 
-4단계 이후의 상세 단계 문서는 해당 단계가 가까워졌을 때 만든다. 전체 방향은 [제품 로드맵](product/roadmap.md)에서 관리한다.
+5단계 이후의 상세 단계 문서는 해당 단계가 가까워졌을 때 만든다. 전체 방향은 [제품 로드맵](product/roadmap.md)에서 관리한다.
 
 ## Documents Created Later
 
