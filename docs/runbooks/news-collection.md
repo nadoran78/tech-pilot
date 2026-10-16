@@ -43,7 +43,7 @@ uv run tech-pilot collect --source hugging-face-blog
 uv run tech-pilot collect --source google-ai-blog
 ```
 
-각 출처에 GET 요청을 최대 한 번 보낸다. Hugging Face의 조건부 요청은 [결정 기록 0004](../decisions/0004-hugging-face-rss-transport.md)의 현재 구현을 유지하며, 이 결정은 여전히 `Proposed`다. Google은 승인된 [결정 기록 0005](../decisions/0005-google-ai-blog-rss-transport.md)에 따라 KST 달력 날짜별 한 번만 요청하고, 실패한 시도도 포함한다. 같은 날짜에 예약이 있으면 요청하지 않는다. 예약은 지정한 SQLite DB에 저장되므로 운영에는 같은 DB를 지속해서 사용한다. 별도 DB는 전역 요청 한도를 공유하지 않으며, DB 변경·삭제로 한도를 우회하지 않는다.
+각 출처에 GET 요청을 최대 한 번 보낸다. Hugging Face의 조건부 요청은 2026-10-15 사용자가 승인한 [결정 기록 0004](../decisions/0004-hugging-face-rss-transport.md)를 따른다. Google은 승인된 [결정 기록 0005](../decisions/0005-google-ai-blog-rss-transport.md)에 따라 KST 달력 날짜별 한 번만 요청하고, 실패한 시도도 포함한다. 같은 날짜에 예약이 있으면 요청하지 않는다. 예약은 지정한 SQLite DB에 저장되므로 운영에는 같은 DB를 지속해서 사용한다. 별도 DB는 전역 요청 한도를 공유하지 않으며, DB 변경·삭제로 한도를 우회하지 않는다.
 
 ## Inspect Stored Items
 
@@ -113,4 +113,4 @@ uv run tech-pilot history --database /path/to/news.sqlite3
 4. Hugging Face 단독 실행에서 `unchanged`가 관찰되면 조건부 요청 동작을 기록한다. Google은 같은 날 재실행하면 `limit_reached`가 정상 결과다.
 5. 로컬 DB와 수집 출력에는 외부 콘텐츠가 포함될 수 있으므로 Git에 추가하거나 PR에 붙이지 않는다.
 
-이 검토 결과를 바탕으로 사용자만이 4단계 전환, 두 번째 출처 조사 또는 결정 기록 0004의 승인 여부를 결정한다.
+사용자는 2026-10-15에 기존 품질·운영 검토의 한계를 수용하고 결정 기록 0004와 3단계 완료·4단계 전환을 승인했다. 이는 수동 수집 조건을 바꾸거나 자동화를 승인한 것이 아니다. 현재 후속 설계는 [4단계 문서](../phases/04-news-understanding.md)를 따른다.
