@@ -46,6 +46,8 @@ Issue #63의 [입력·출력 제안](../specs/news-understanding-input-output.md
 
 ## 미결정 사항과 다음 이슈 순서
 
+Issue #65의 [ADR 0007](../decisions/0007-news-understanding-execution-storage.md)과 [저장·재실행 제안](../specs/news-understanding-storage.md)에 선택지·권장안·승인 순서를 정리했다. Proposed/Draft 상태이며 입력·평가안 승인이나 구현·모델 실행 승인을 의미하지 않는다.
+
 1. **입력·평가 설계:** 표본·내용 충분성·원문과 제목 수준 처리 구분·부족 시 처리·평가 기준.
 2. **기술·저장 결정:** 로컬/외부 모델·의존성·비용 상한·개인정보와 외부 전송·생성 결과 저장·재실행 계약. 중요한 선택은 ADR로 제안한다.
 3. **최소 구현·표본 평가:** 승인된 계약 아래 작은 수동 처리 경로를 구현·검증한다. 유료 호출은 별도 명시적 승인 뒤에만 수행한다.
