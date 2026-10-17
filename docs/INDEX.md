@@ -45,6 +45,8 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [뉴스 항목 계약](specs/news-item.md) | Accepted | 수집·보관할 최소 뉴스 항목과 기술적 중복 기준은 무엇인가? |
+| [요약·분류 입력·출력 제안](specs/news-understanding-input-output.md) | Draft | 현재 입력에서 어떤 설명·분류를 허용하거나 보류하는가? |
+| [요약·분류 평가 제안](specs/news-understanding-evaluation.md) | Draft | 표본·예시·검토표·통과 기준을 어떻게 설계하는가? |
 
 ## Policies
 
