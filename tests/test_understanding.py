@@ -24,6 +24,10 @@ from tech_pilot.understanding.service import process_news
 
 @pytest.fixture
 def repository(tmp_path: Path) -> SQLiteUnderstandingRepository:
+    return make_repository(tmp_path)
+
+
+def make_repository(tmp_path: Path) -> SQLiteUnderstandingRepository:
     repo = SQLiteUnderstandingRepository(tmp_path / "news.sqlite3")
     repo.store(
         NewsItem(
@@ -237,7 +241,7 @@ def test_upgrade_from_v4_preserves_original_and_reservation(tmp_path, monkeypatc
             connection.execute("SELECT * FROM source_daily_request_reservations").fetchall()
             == before_reservations
         )
-        assert connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone() == (5,)
+        assert connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone() == (6,)
     assert (
         process_news(
             repo, 1, ProcessingRequest(RequestKind.DESCRIBE, "fake", "1", "1"), described
@@ -269,3 +273,126 @@ def test_termination_does_not_claim_terminal_attempt(repository, request_spec):
     with pytest.raises(KeyboardInterrupt):
         process_news(repository, 1, request_spec, terminate)
     assert repository.list_attempts(1) == ()
+
+
+@pytest.mark.parametrize("foreign_keys", [0, 1])
+def test_v5_upgrade_removes_fk_and_preserves_attempts(
+    tmp_path, monkeypatch, request_spec, foreign_keys
+):
+    path = tmp_path / "legacy.sqlite3"
+    all_migrations = migrations.MIGRATIONS
+    with monkeypatch.context() as patch:
+        patch.setattr(migrations, "MIGRATIONS", all_migrations[:5])
+        repo = SQLiteUnderstandingRepository(path)
+        repo.store(
+            NewsItem(
+                source_id="synthetic",
+                title="Example releases Widget",
+                canonical_url="https://example.com/legacy",
+                evidence_url="https://example.com/legacy",
+                source_endpoint="https://example.com/rss",
+                collected_at=datetime.now(UTC),
+            )
+        )
+
+        def fail(*_):
+            raise RuntimeError("synthetic failure")
+
+        process_news(repo, 1, request_spec, fail)
+        original = process_news(repo, 1, request_spec, described)
+        with sqlite3.connect(path) as connection:
+            assert connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall()
+            before = connection.execute(
+                "SELECT * FROM understanding_attempts ORDER BY id"
+            ).fetchall()
+    with sqlite3.connect(path) as connection:
+        connection.execute(f"PRAGMA foreign_keys={foreign_keys}")
+        migrations.apply_migrations(connection)
+        migrations.apply_migrations(connection)
+        assert (
+            connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall() == []
+        )
+        assert (
+            connection.execute("SELECT * FROM understanding_attempts ORDER BY id").fetchall()
+            == before
+        )
+    assert process_news(repo, 1, request_spec, described).attempt == original.attempt
+    snapshot = original.attempt.snapshot
+    with pytest.raises(sqlite3.IntegrityError):
+        repo.save_attempt(
+            snapshot,
+            request_spec,
+            started_at=datetime.now(UTC),
+            result=described(),
+            error_code=None,
+        )
+
+
+def test_new_schema_has_no_fk_but_retains_local_constraints(repository, tmp_path):
+    with sqlite3.connect(tmp_path / "news.sqlite3") as connection:
+        connection.execute("PRAGMA foreign_keys=ON")
+        assert (
+            connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall() == []
+        )
+        # Direct SQL bypasses application reference validation; other constraints still hold.
+        connection.execute("""INSERT INTO understanding_attempts
+            (news_id,reuse_key,snapshot_json,request_json,started_at,finished_at,status,error_code)
+            VALUES (999,'synthetic-key','{}','{}','start','finish','failed','processing_failed')""")
+        for update in ("news_id=NULL", "status='invalid'", "result_json='{}'"):
+            with pytest.raises(sqlite3.IntegrityError):
+                connection.execute(f"UPDATE understanding_attempts SET {update}")
+
+
+def test_save_rejects_missing_original_without_db_fk(repository, request_spec):
+    snapshot = replace(InputSnapshot.from_news(repository.get(1)), news_id=999)
+    with pytest.raises(InputRejected):
+        repository.save_attempt(
+            snapshot,
+            request_spec,
+            started_at=datetime.now(UTC),
+            result=described(),
+            error_code=None,
+        )
+    assert repository.list_attempts(999) == ()
+
+
+def test_original_deleted_during_processing_is_rejected(repository, request_spec, tmp_path):
+    def delete_original(*_):
+        with sqlite3.connect(tmp_path / "news.sqlite3") as connection:
+            connection.execute("DELETE FROM news_items WHERE id=1")
+        return described()
+
+    with pytest.raises(InputRejected):
+        process_news(repository, 1, request_spec, delete_original)
+    assert repository.list_attempts(1) == ()
+
+
+def test_fk_removal_failure_rolls_back_old_table_and_index(tmp_path, monkeypatch, request_spec):
+    all_migrations = migrations.MIGRATIONS
+    with monkeypatch.context() as patch:
+        patch.setattr(migrations, "MIGRATIONS", all_migrations[:5])
+        repo = make_repository(tmp_path)
+        original = process_news(repo, 1, request_spec, described)
+    # Use the fixture's synthetic DB; only its schema is migrated in this test.
+    path = tmp_path / "news.sqlite3"
+    broken = replace(
+        all_migrations[-1],
+        statements=(*all_migrations[-1].statements, "SELECT missing_column FROM news_items"),
+    )
+    with monkeypatch.context() as patch:
+        patch.setattr(migrations, "MIGRATIONS", (*all_migrations[:-1], broken))
+        with sqlite3.connect(path) as connection:
+            with pytest.raises(sqlite3.OperationalError):
+                migrations.apply_migrations(connection)
+            assert connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall()
+            assert (
+                connection.execute(
+                    "SELECT version FROM schema_migrations WHERE version=6"
+                ).fetchone()
+                is None
+            )
+            assert connection.execute(
+                "SELECT name FROM sqlite_master WHERE name='understanding_completed_key'"
+            ).fetchone()
+    repo.migrate()
+    assert repo.completed(original.attempt.reuse_key) == original.attempt

@@ -35,6 +35,7 @@
 - 기술 스택 검토: [2단계 문서](docs/phases/02-tech-stack-selection.md), [결정 기록 안내](docs/decisions/README.md)
 - 뉴스 수집 설계: [3단계 문서](docs/phases/03-news-collection.md)
 - 뉴스 요약·분류 설계: [4단계 문서](docs/phases/04-news-understanding.md)
+- DB 관계·저장·migration 설계: [물리적 외래키 기본 미사용 기준](docs/decisions/0008-logical-reference-integrity.md)
 
 ## Working Rules
 

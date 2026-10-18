@@ -63,7 +63,6 @@ class SQLiteUnderstandingRepository(SQLiteNewsRepository):
         if started_at > finished_at:
             raise ValueError("start cannot be after finish")
         with self._connect() as connection:
-            connection.execute("PRAGMA foreign_keys=ON")
             apply_migrations(connection)
             connection.execute("BEGIN IMMEDIATE")
             original = connection.execute(
