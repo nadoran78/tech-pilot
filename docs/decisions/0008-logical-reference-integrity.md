@@ -22,7 +22,9 @@ Issue #67 / PR #68 검토 중 사용자가 물리적 외래키를 기본적으�
 
 `understanding_attempts.news_id`는 논리적 참조로 유지한다. `save_attempt`의 짧은 쓰기 트랜잭션에서 원본 존재·스냅샷 일치를 확인하는 코드는 유지한다. DB에 직접 쓰는 도구·스크립트까지 이 검증이 강제되지는 않으므로 해당 경로는 별도 검증 책임을 가진다.
 
-기존 migration 5는 적용 이력의 재현을 위해 그대로 두고, migration 6에서 테이블을 물리적 외래키 없이 재구성한다. ID·전체 시도 기록과 나머지 제약·unique index를 보존하며 실패 시 해당 migration을 원자적으로 롤백한다. 신규 DB도 6까지 적용한 최종 스키마에는 외래키가 없다. 실제 운영 DB에는 이번 작업에서 실행하지 않는다.
+후속 사용자 요청에 따라 병합 전 migration 5의 외래키 선언을 직접 제거하고 불필요한 migration 6은 삭제한다. 새 DB와 기존 기준 버전 4에서 적용한 DB 모두 버전 5에서 외래키 없는 테이블을 생성한다. NOT NULL·CHECK·정상 결과 unique index와 원본 참조 검증은 유지한다. 이전의 5→6 전환안은 채택하지 않는다. 실제 운영 DB에는 실행하지 않는다.
+
+migration 수정·새 버전 추가의 판단 기준은 [개발 워크플로의 Migration Change Policy](../process/development-workflow.md#migration-change-policy)를 따른다. 이전 PR 커밋의 스키마를 보존할 로컬 DB에 적용했다면 수정된 5가 재실행되지 않으므로 별도 이관 판단이 필요하다. 이번 작업에서 로컬 DB를 삭제·재생성하거나 migration 기록을 변경하지 않는다.
 
 ## Consequences
 

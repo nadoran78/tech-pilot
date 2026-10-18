@@ -212,7 +212,8 @@ def test_supported_contract_versions_are_explicit():
         ProcessingRequest(RequestKind.DESCRIBE, "fake", "1", "1", input_version="future")
 
 
-def test_upgrade_from_v4_preserves_original_and_reservation(tmp_path, monkeypatch):
+@pytest.mark.parametrize("foreign_keys", [0, 1])
+def test_upgrade_from_v4_preserves_original_and_reservation(tmp_path, monkeypatch, foreign_keys):
     all_migrations = migrations.MIGRATIONS
     with monkeypatch.context() as patch:
         patch.setattr(migrations, "MIGRATIONS", all_migrations[:4])
@@ -233,15 +234,20 @@ def test_upgrade_from_v4_preserves_original_and_reservation(tmp_path, monkeypatc
             before_reservations = connection.execute(
                 "SELECT * FROM source_daily_request_reservations"
             ).fetchall()
-    repo.migrate()
-    repo.migrate()
+    with sqlite3.connect(tmp_path / "upgrade.sqlite3") as connection:
+        connection.execute(f"PRAGMA foreign_keys={foreign_keys}")
+        migrations.apply_migrations(connection)
+        migrations.apply_migrations(connection)
+        assert (
+            connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall() == []
+        )
     with sqlite3.connect(tmp_path / "upgrade.sqlite3") as connection:
         assert connection.execute("SELECT * FROM news_items").fetchall() == before_news
         assert (
             connection.execute("SELECT * FROM source_daily_request_reservations").fetchall()
             == before_reservations
         )
-        assert connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone() == (6,)
+        assert connection.execute("SELECT COUNT(*) FROM schema_migrations").fetchone() == (5,)
     assert (
         process_news(
             repo, 1, ProcessingRequest(RequestKind.DESCRIBE, "fake", "1", "1"), described
@@ -275,51 +281,11 @@ def test_termination_does_not_claim_terminal_attempt(repository, request_spec):
     assert repository.list_attempts(1) == ()
 
 
-@pytest.mark.parametrize("foreign_keys", [0, 1])
-def test_v5_upgrade_removes_fk_and_preserves_attempts(
-    tmp_path, monkeypatch, request_spec, foreign_keys
-):
-    path = tmp_path / "legacy.sqlite3"
-    all_migrations = migrations.MIGRATIONS
-    with monkeypatch.context() as patch:
-        patch.setattr(migrations, "MIGRATIONS", all_migrations[:5])
-        repo = SQLiteUnderstandingRepository(path)
-        repo.store(
-            NewsItem(
-                source_id="synthetic",
-                title="Example releases Widget",
-                canonical_url="https://example.com/legacy",
-                evidence_url="https://example.com/legacy",
-                source_endpoint="https://example.com/rss",
-                collected_at=datetime.now(UTC),
-            )
-        )
-
-        def fail(*_):
-            raise RuntimeError("synthetic failure")
-
-        process_news(repo, 1, request_spec, fail)
-        original = process_news(repo, 1, request_spec, described)
-        with sqlite3.connect(path) as connection:
-            assert connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall()
-            before = connection.execute(
-                "SELECT * FROM understanding_attempts ORDER BY id"
-            ).fetchall()
-    with sqlite3.connect(path) as connection:
-        connection.execute(f"PRAGMA foreign_keys={foreign_keys}")
-        migrations.apply_migrations(connection)
-        migrations.apply_migrations(connection)
-        assert (
-            connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall() == []
-        )
-        assert (
-            connection.execute("SELECT * FROM understanding_attempts ORDER BY id").fetchall()
-            == before
-        )
-    assert process_news(repo, 1, request_spec, described).attempt == original.attempt
+def test_completed_key_unique_constraint_is_retained(repository, request_spec):
+    original = process_news(repository, 1, request_spec, described)
     snapshot = original.attempt.snapshot
     with pytest.raises(sqlite3.IntegrityError):
-        repo.save_attempt(
+        repository.save_attempt(
             snapshot,
             request_spec,
             started_at=datetime.now(UTC),
@@ -367,13 +333,11 @@ def test_original_deleted_during_processing_is_rejected(repository, request_spec
     assert repository.list_attempts(1) == ()
 
 
-def test_fk_removal_failure_rolls_back_old_table_and_index(tmp_path, monkeypatch, request_spec):
+def test_migration_5_failure_rolls_back_table_and_index(tmp_path, monkeypatch, request_spec):
     all_migrations = migrations.MIGRATIONS
     with monkeypatch.context() as patch:
-        patch.setattr(migrations, "MIGRATIONS", all_migrations[:5])
+        patch.setattr(migrations, "MIGRATIONS", all_migrations[:4])
         repo = make_repository(tmp_path)
-        original = process_news(repo, 1, request_spec, described)
-    # Use the fixture's synthetic DB; only its schema is migrated in this test.
     path = tmp_path / "news.sqlite3"
     broken = replace(
         all_migrations[-1],
@@ -384,15 +348,25 @@ def test_fk_removal_failure_rolls_back_old_table_and_index(tmp_path, monkeypatch
         with sqlite3.connect(path) as connection:
             with pytest.raises(sqlite3.OperationalError):
                 migrations.apply_migrations(connection)
-            assert connection.execute("PRAGMA foreign_key_list(understanding_attempts)").fetchall()
             assert (
                 connection.execute(
-                    "SELECT version FROM schema_migrations WHERE version=6"
+                    "SELECT name FROM sqlite_master WHERE name='understanding_attempts'"
                 ).fetchone()
                 is None
             )
-            assert connection.execute(
-                "SELECT name FROM sqlite_master WHERE name='understanding_completed_key'"
-            ).fetchone()
+            assert (
+                connection.execute(
+                    "SELECT version FROM schema_migrations WHERE version=5"
+                ).fetchone()
+                is None
+            )
+            assert (
+                connection.execute(
+                    "SELECT name FROM sqlite_master WHERE name='understanding_completed_key'"
+                ).fetchone()
+                is None
+            )
+            assert connection.execute("SELECT COUNT(*) FROM news_items").fetchone() == (1,)
     repo.migrate()
+    original = process_news(repo, 1, request_spec, described)
     assert repo.completed(original.attempt.reuse_key) == original.attempt

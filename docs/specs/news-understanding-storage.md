@@ -64,7 +64,7 @@ Issue #67의 임시 DB·가짜 처리기 테스트로 같은 키 재사용·변�
 
 - [입력·요청·결과 모델](../../src/tech_pilot/understanding/models.py): `title-v1` 입력/출력 계약만 지원한다. 스냅샷은 원본 ID, source_id, evidence_url, title, published_at(누락은 null)로 제한한다. excerpt·raw_metadata·본문·수집 시각은 처리 입력이 아니다.
 - 스냅샷은 필드를 바꾸지 않고 UTF-8 JSON(`ensure_ascii=False`, 키 정렬, 공백 없는 구분자)으로 직렬화해 SHA-256 fingerprint를 계산한다. 원본 ID·fingerprint·요청 전체를 같은 방식으로 해시한 값이 재사용 키다. 요청에는 종류·입출력 버전·방법·처리·설정 버전을 모두 포함한다. 지원하지 않는 계약 버전은 거부한다.
-- [migration 5·6](../../src/tech_pilot/storage/migrations.py)의 `understanding_attempts`에 스냅샷/요청/결과 JSON, UTC 시작·종료 시각, 실행 상태·안전한 오류 코드를 저장한다. [ADR 0008](../decisions/0008-logical-reference-integrity.md)에 따라 최종 스키마는 물리적 외래키 없이 논리적 news_id 참조를 사용한다. migration 6은 기존 5의 외래키를 제거하며 시도 ID·전체 기록을 보존한다. completed 키의 부분 unique index와 NOT NULL·CHECK 제약은 유지한다. 동시 실행 품질·재시도는 보장하지 않는다.
+- [migration 5](../../src/tech_pilot/storage/migrations.py)의 `understanding_attempts`에 스냅샷/요청/결과 JSON, UTC 시작·종료 시각, 실행 상태·안전한 오류 코드를 저장한다. [ADR 0008](../decisions/0008-logical-reference-integrity.md)에 따라 처음부터 물리적 외래키 없이 논리적 news_id 참조를 사용한다. completed 키의 부분 unique index와 NOT NULL·CHECK 제약은 유지한다. 동시 실행 품질·재시도는 보장하지 않는다.
 - [저장소](../../src/tech_pilot/storage/understanding.py)는 짧은 트랜잭션에서 원본 존재·스냅샷 일치를 재확인하고 종료 기록을 추가한다. 외부 처리 중 쓰기 잠금을 잡지 않는다. 기존 이력을 갱신·삭제하는 API는 제공하지 않는다.
 - [처리 서비스](../../src/tech_pilot/understanding/service.py) `process_news`는 주입한 처리기를 최대 1회 호출한다. 참조 오류는 `InputRejected`, 저장 실패는 `UnderstandingStorageError`로 구분한다. 처리 예외는 `processing_failed`, 결과 구조 오류는 `validation_failed`로 기록하며 원시 예외는 보관하지 않는다. 강제 종료는 기록이 없을 수 있다.
 - 원문 요약 요청에 설명 결과를 반환하거나 title에 없는 근거 문자열을 사용하면 검증 실패다. 설명 텍스트의 의미·분류의 정확성은 구조 검사만으로 보장하지 않으며 사람 평가 대상이다. 실제 규칙·CLI·표본 평가는 포함하지 않는다.
