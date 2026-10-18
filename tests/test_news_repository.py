@@ -54,6 +54,7 @@ def test_migrations_are_applied_once(tmp_path: Path) -> None:
         (2, "create_source_http_validators"),
         (3, "create_source_daily_request_reservations"),
         (4, "create_collection_runs"),
+        (5, "create_understanding_attempts"),
     ]
     assert table == ("news_items",)
 
@@ -144,7 +145,7 @@ def test_failed_migration_rolls_back_before_retry(
     SQLiteNewsRepository(database_path).migrate()
     existing_migrations = migrations.MIGRATIONS
     failed_migration = Migration(
-        version=5,
+        version=6,
         name="create_retryable_table",
         statements=(
             "CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",
@@ -152,7 +153,7 @@ def test_failed_migration_rolls_back_before_retry(
         ),
     )
     completed_migration = Migration(
-        version=5,
+        version=6,
         name="create_retryable_table",
         statements=("CREATE TABLE retryable_items (id INTEGER PRIMARY KEY)",),
     )
@@ -166,7 +167,7 @@ def test_failed_migration_rolls_back_before_retry(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
         ).fetchone()
         version = connection.execute(
-            "SELECT version FROM schema_migrations WHERE version = 5"
+            "SELECT version FROM schema_migrations WHERE version = 6"
         ).fetchone()
 
         assert table is None
@@ -180,11 +181,11 @@ def test_failed_migration_rolls_back_before_retry(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'retryable_items'"
         ).fetchone()
         version = connection.execute(
-            "SELECT version FROM schema_migrations WHERE version = 5"
+            "SELECT version FROM schema_migrations WHERE version = 6"
         ).fetchone()
 
     assert table == ("retryable_items",)
-    assert version == (5,)
+    assert version == (6,)
 
 
 def test_stores_and_reads_all_news_item_fields(tmp_path: Path) -> None:

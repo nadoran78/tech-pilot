@@ -1,14 +1,14 @@
 # 뉴스 설명·분류 결과 저장 및 재실행 제안
 
-- **Status:** Draft
+- **Status:** Accepted
 - **Applies to:** Phase 4, Issue #65
 - **Purpose:** 원본 연결·입력 추적·결과 보존·재처리·실패의 최소 논리 경계를 제안한다.
 - **Read when:** 생성 결과 저장·재실행·실패 처리 또는 후속 migration을 설계할 때
-- **Related documents:** [ADR 0007](../decisions/0007-news-understanding-execution-storage.md), [입력·출력 Draft](news-understanding-input-output.md), [평가 Draft](news-understanding-evaluation.md), [뉴스 원본 계약](news-item.md), [기존 SQLite 결정](../decisions/0003-sqlite-news-item-storage.md)
+- **Related documents:** [ADR 0007](../decisions/0007-news-understanding-execution-storage.md), [입력·출력 계약](news-understanding-input-output.md), [평가 기준](news-understanding-evaluation.md), [뉴스 원본 계약](news-item.md), [기존 SQLite 결정](../decisions/0003-sqlite-news-item-storage.md)
 
 ## 상태와 범위
 
-모든 항목은 사용자 검토용 제안이다. 승인된 원본·수집 계약을 바꾸거나 DB schema를 확정하지 않는다. 기존 SQLite에 생성 정보용 별도 기록을 두는 방향을 제안하며 JSON 파일만 저장하는 대안은 별도 DB migration을 줄이지만 원본 연결·조회·중복 제어를 파일 계층에서 관리해야 한다. 현재 소량 단일 로컬 운영과 기존 기술 기준에는 SQLite 재사용을 권장한다.
+2026-10-18 사용자가 ADR 0007의 실행·저장·재실행안과 입력·평가안을 명시적으로 승인했다. Issue #67에서 기존 SQLite에 원본·수집 기록과 분리한 종료 시도 테이블을 구현한다. 기존 원본·수집 계약은 바꾸지 않으며 실제 운영 DB migration은 실행하지 않는다.
 
 ## 최소 논리 기록
 
@@ -19,10 +19,10 @@
 | 처리 추적 | 방법 식별자·처리 버전·설정/규칙 버전. 향후 모델 도입 시 추가할 provenance는 별도 결정; 이번에는 모델 값 없음 |
 | 시각 | 시작·종료의 timezone 포함 UTC 시각. 뉴스 발표 시각과 구분 |
 | 실행 상태 | completed(검증된 결과 확정) 또는 failed(처리/검증 오류). 품질 평가의 합격을 뜻하지 않음 |
-| 내용 결과 | 입력·출력 Draft의 described/insufficient_information/deferred 등 내용 상태, 허용 시 생성 텍스트·잠정 분류·근거 필드·한계·보류 사유 |
+| 내용 결과 | 입력·출력 계약의 described/insufficient_information/deferred 등 내용 상태, 허용 시 생성 텍스트·잠정 분류·근거 필드·한계·보류 사유 |
 | 오류 | failed에서는 안전한 분류 코드와 결과 없음. 원시 예외·DB 경로·비밀 값·본문·프롬프트 전체를 로그처럼 복사하지 않음 |
 
-내용 상태와 실행 상태는 별개다. 예컨대 충분하지 않은 입력을 정상적으로 판별한 completed + insufficient_information은 실패가 아니며, 처리 예외를 정보 부족으로 숨기면 안 된다. 메타데이터 경로의 summarized 출력이나 입력 밖 근거는 결과 검증 오류로 failed 처리하고 정상 결과로 노출하지 않는 방향이다. deferred의 범위·안전한 오류 코드 명칭·직렬화·제약은 후속 세부 설계에서 확정한다.
+내용 상태와 실행 상태는 별개다. 예컨대 충분하지 않은 입력을 정상적으로 판별한 completed + insufficient_information은 실패가 아니며, 처리 예외를 정보 부족으로 숨기면 안 된다. 메타데이터 경로의 summarized 출력이나 입력 밖 근거 문자열은 결과 검증 오류로 failed 처리하고 정상 결과로 노출하지 않는다. deferred는 이유가 있는 보류 결과이며 참조 없는 사전 거부와 다르다. 오류 코드·직렬화·제약은 아래 첫 구현 연결을 따른다.
 
 원본 참조가 없거나 승인되지 않은 경로는 실행 전에 거부·보류하고 생성 결과를 잘못된 원본에 연결하지 않는다. 이 사전 거부는 원본에 연결된 completed/failed 시도 기록 대상과 구분한다. 참조 없는 거부 진단의 영속화는 첫 저장 구현에 포함하지 않는 방향이다.
 
@@ -58,4 +58,14 @@
 | 처리 예외 또는 금지된 summarized 출력 | 안전한 failed, 정상 결과 없음; 자동 재시도 없음 |
 | 저장 오류 또는 프로세스 강제 종료 | 완료 저장 주장 금지; 기록 누락 가능성과 운영 한계 표시 |
 
-후속 임시 DB·가짜 처리기 테스트로 같은 키 재사용·변경 키 보존·요청 분리·실패/보류·저장 오류·기존 수집 상태 불변을 검증한다. 이후 사용자 승인된 평가 표본으로 읽기 유용성과 분류를 따로 평가한다. 논리 계약 승인 전에는 migration이나 런타임 동작을 구현하지 않는다.
+Issue #67의 임시 DB·가짜 처리기 테스트로 같은 키 재사용·변경 키 보존·요청 분리·실패/보류·저장 오류·기존 수집 상태 불변을 검증한다. 이후 승인된 평가 기준으로 읽기 유용성과 분류를 따로 평가한다.
+
+## 첫 구현 연결 (Issue #67)
+
+- [입력·요청·결과 모델](../../src/tech_pilot/understanding/models.py): `title-v1` 입력/출력 계약만 지원한다. 스냅샷은 원본 ID, source_id, evidence_url, title, published_at(누락은 null)로 제한한다. excerpt·raw_metadata·본문·수집 시각은 처리 입력이 아니다.
+- 스냅샷은 필드를 바꾸지 않고 UTF-8 JSON(`ensure_ascii=False`, 키 정렬, 공백 없는 구분자)으로 직렬화해 SHA-256 fingerprint를 계산한다. 원본 ID·fingerprint·요청 전체를 같은 방식으로 해시한 값이 재사용 키다. 요청에는 종류·입출력 버전·방법·처리·설정 버전을 모두 포함한다. 지원하지 않는 계약 버전은 거부한다.
+- [migration 5](../../src/tech_pilot/storage/migrations.py)의 `understanding_attempts`에 스냅샷/요청/결과 JSON, UTC 시작·종료 시각, 실행 상태·안전한 오류 코드를 저장한다. 원본 FK와 completed 키의 부분 unique index를 두고 결과/오류의 상호 배타성을 CHECK로 제한한다. 동시 실행 품질·재시도는 보장하지 않는다.
+- [저장소](../../src/tech_pilot/storage/understanding.py)는 짧은 트랜잭션에서 원본 존재·스냅샷 일치를 재확인하고 종료 기록을 추가한다. 외부 처리 중 쓰기 잠금을 잡지 않는다. 기존 이력을 갱신·삭제하는 API는 제공하지 않는다.
+- [처리 서비스](../../src/tech_pilot/understanding/service.py) `process_news`는 주입한 처리기를 최대 1회 호출한다. 참조 오류는 `InputRejected`, 저장 실패는 `UnderstandingStorageError`로 구분한다. 처리 예외는 `processing_failed`, 결과 구조 오류는 `validation_failed`로 기록하며 원시 예외는 보관하지 않는다. 강제 종료는 기록이 없을 수 있다.
+- 원문 요약 요청에 설명 결과를 반환하거나 title에 없는 근거 문자열을 사용하면 검증 실패다. 설명 텍스트의 의미·분류의 정확성은 구조 검사만으로 보장하지 않으며 사람 평가 대상이다. 실제 규칙·CLI·표본 평가는 포함하지 않는다.
+- 검증 진입점: [계약·실행·저장 테스트](../../tests/test_understanding.py), [기존 migration 회귀 테스트](../../tests/test_news_repository.py).
