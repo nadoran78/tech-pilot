@@ -48,6 +48,7 @@
 | [요약·분류 입력·출력 계약](specs/news-understanding-input-output.md) | Accepted | 현재 입력에서 어떤 설명·분류를 허용하거나 보류하는가? |
 | [요약·분류 평가 기준](specs/news-understanding-evaluation.md) | Accepted | 표본·예시·검토표·통과 기준은 무엇인가? |
 | [설명·분류 저장·재실행 계약](specs/news-understanding-storage.md) | Accepted | 원본과 생성 결과를 어떻게 연결·보존·재사용하는가? |
+| [제목 규칙 기준선](specs/news-understanding-rules.md) | Active | 첫 규칙 처리기는 어떤 표현에서 설명·분류하거나 판단을 보류하는가? |
 
 ## Policies
 

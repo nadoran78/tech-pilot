@@ -11,11 +11,22 @@ from tech_pilot.understanding.models import (
     InputSnapshot,
     ProcessingOutcome,
     ProcessingRequest,
+    RequestKind,
     UnderstandingResult,
     UnderstandingStorageError,
 )
+from tech_pilot.understanding.rules import apply_title_rules, rule_request
 
 Processor = Callable[[InputSnapshot, ProcessingRequest], UnderstandingResult]
+
+
+def process_title_with_rules(
+    repository: SQLiteUnderstandingRepository,
+    news_id: int,
+    kind: RequestKind = RequestKind.DESCRIBE,
+) -> ProcessingOutcome:
+    """Use the version-bound title baseline through the existing persistence boundary."""
+    return process_news(repository, news_id, rule_request(kind), apply_title_rules)
 
 
 def process_news(
