@@ -14,7 +14,7 @@ from tech_pilot.understanding.models import (
 
 METHOD = "title-rules"
 PROCESSING_VERSION = "1"
-RULESET_VERSION = "rules-v1"
+RULESET_VERSION = "rules-v2"
 
 
 def _terms(*terms: str) -> re.Pattern[str]:
@@ -74,6 +74,13 @@ _CAUTION_EN = _terms(
     "expected",
     "planned",
     "will",
+    "canceled",
+    "cancelled",
+    "cancellation",
+    "delayed",
+    "delay",
+    "postponed",
+    "postponement",
     "ignore",
     "instruction",
     "instructions",

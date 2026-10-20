@@ -8,7 +8,7 @@
 
 ## 적용 범위
 
-2026-10-20 사용자가 규칙 기준선 구현 계획과 Issue·PR 발행을 승인했다. 아래는 해당 범위에서 구현·리뷰할 v1 규칙이며 실제 뉴스 품질 검토를 통과했다는 기록은 아니다. 한국어·영어의 제한된 명시적 표현만 지원하며, 번역·언어 판별·원문 접근·사전 지식 보충은 하지 않는다. 다음 규칙표와 합성 예시는 구현 전에 작성한 기준이다.
+2026-10-20 사용자가 규칙 기준선 구현 계획과 Issue·PR 발행을 승인했다. 아래는 해당 범위에서 구현·리뷰할 규칙이며 실제 뉴스 품질 검토를 통과했다는 기록은 아니다. 최초 v1 규칙표·합성 예시를 구현 전에 작성했고, PR #70 리뷰에서 영어 취소·연기 보류를 보완해 현재 규칙은 v2다. 한국어·영어의 제한된 명시적 표현만 지원하며, 번역·언어 판별·원문 접근·사전 지식 보충은 하지 않는다.
 
 ## 규칙표와 우선순위
 
@@ -27,6 +27,7 @@
 - 공개 신호: `introducing`, `announcing`, `release`, `releases`, `released`, `launch`, `launches`, `launched`, `공개`, `출시`, `발표`.
 - 사용법 신호: `how to`, `tutorial`, `guide`, `사용법`, `튜토리얼`, `활용 사례`.
 - 부정·불확실성 신호: `no`, `not`, `never`, `without`, `isn't`, `doesn't`, `won't`, `cannot`, `can't`, `may`, `might`, `rumor(s)`, `expected`, `planned`, `will`, `아님`, `아니다`, `아닌`, `않`, `안`, `못`, `없`, `예정`, `계획`, `루머`, `추측`, `검토`, `불가`, `취소`.
+- 영어 취소·연기 신호(v2 추가): `canceled`, `cancelled`, `cancellation`, `delayed`, `delay`, `postponed`, `postponement`. 공개 신호보다 먼저 보류하므로 설명·원문 요약 요청 모두 판단 불가로 남긴다. 기존 영어 단어 경계를 유지한다.
 - 지시문 신호: `ignore`, `instruction(s)`, `execute`, `run`, `무시`, `명령`, `실행`.
 - 영어 어휘는 Unicode 단어 경계를 확인해 `modeling`, `releasedate`, `guidebook` 등의 부분 문자열을 일치시키지 않는다. 여러 단어 표현은 공백 하나로만 지원한다. 한국어 대상·긍정 신호도 단어 경계를 요구하므로 `모델을`, `공개합니다` 등 조사·활용형은 현재 인식하지 않는다. 한국어 부정·불확실성·지시문은 누락을 줄이기 위해 부분 문자열로 검사한다. 따라서 무관한 표현을 과도하게 보류할 수 있다.
 
@@ -41,12 +42,13 @@
 | `테스트 조직의 연례 문화 행사` / `Example cultural event` | described + 비기술 소식 |
 | `Synthetic release` / `다음 장을 시작하며` | 정보 부족 + 판단 불가 |
 | `Example model not released` / `모델 공개 예정` | 정보 부족 + 판단 불가 |
+| `Example model release canceled` / `Example model release delayed` / `Example model release postponed` | 정보 부족 + 판단 불가 |
 | `Example model released?` / `"Example model released"` | 정보 부족 + 판단 불가 |
 | `Example model released: tutorial` | 정보 부족 + 판단 불가(범주 충돌) |
 
 ## 구현·버전·한계
 
-구현은 [rules.py](../../src/tech_pilot/understanding/rules.py), 저장 연동은 [service.py](../../src/tech_pilot/understanding/service.py)의 `process_title_with_rules`다. 순수 처리기 `apply_title_rules`는 입력과 요청만 받아 같은 입력·버전에 같은 결과를 반환한다. `rule_request`가 방법 `title-rules`·처리 `1`·규칙 `rules-v1`·입출력 `title-v1`을 고정한다. 다른 처리 신원을 임의로 부여하면 거부한다. 규칙·어휘·사유·출력 의미가 바뀌면 규칙 버전을, 실행 알고리즘이 바뀌면 처리 버전도 갱신하고 기존 결과는 덮어쓰지 않는다.
+구현은 [rules.py](../../src/tech_pilot/understanding/rules.py), 저장 연동은 [service.py](../../src/tech_pilot/understanding/service.py)의 `process_title_with_rules`다. 순수 처리기 `apply_title_rules`는 입력과 요청만 받아 같은 입력·버전에 같은 결과를 반환한다. `rule_request`가 방법 `title-rules`·처리 `1`·규칙 `rules-v2`·입출력 `title-v1`을 고정한다. 다른 처리 신원을 임의로 부여하면 거부한다. 규칙·어휘·사유·출력 의미가 바뀌면 규칙 버전을, 실행 알고리즘이 바뀌면 처리 버전도 갱신하고 기존 결과는 덮어쓰지 않는다. v1으로 저장한 결과는 이력으로 보존하되 현재 v2 실행에서 재사용하지 않는다.
 
 시각·URL·출처는 연결·추적용이며 분류에 사용하지 않는다. 시각 누락을 채우거나 최신성을 주장하지 않는다. 신호의 동시 출현만 보는 방식이므로 문법적 관계·동음이의어·알려지지 않은 부정·지원 외 언어는 오탐·누락이 가능하다. 일치가 발표의 진위·공식성·효용을 보증하지 않으며 제목 재인용의 정보 이득도 제한적이다.
 

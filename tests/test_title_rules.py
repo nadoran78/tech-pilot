@@ -15,6 +15,7 @@ from tech_pilot.understanding.models import (
     InputRejected,
     InputSnapshot,
     RequestKind,
+    UnderstandingResult,
 )
 
 
@@ -273,3 +274,57 @@ def test_changed_input_abstention_is_completed_and_reusable(repository):
     assert service.process_title_with_rules(repository, 1).attempt == changed.attempt
     assert service.process_title_with_rules(repository, 1).reused
     assert repository.list_attempts(1)[1] == prior.attempt
+
+
+@pytest.mark.parametrize(
+    "ending",
+    [
+        "canceled",
+        "cancelled",
+        "delayed",
+        "postponed",
+        "cancellation",
+        "delay",
+        "postponement",
+    ],
+)
+@pytest.mark.parametrize("kind", list(RequestKind))
+def test_release_cancellation_or_delay_abstains(ending, kind):
+    item = snapshot(f"Example model release {ending}")
+    request = rules.rule_request(kind)
+    result = rules.apply_title_rules(item, request)
+    result.validate(item, request)
+    assert result.status is ContentStatus.INSUFFICIENT
+    assert result.category is Category.UNKNOWN
+    assert result.text is None and result.evidence == () and result.reason
+
+
+def test_caution_terms_still_require_word_boundaries():
+    item = snapshot("Example model release for DelayedWidget")
+    assert rules.apply_title_rules(item, rules.rule_request()).category is Category.TECHNOLOGY
+
+
+def test_corrected_rules_do_not_reuse_old_release_classification(repository):
+    with repository._connect() as connection:
+        connection.execute("UPDATE news_items SET title='Example model release delayed' WHERE id=1")
+    old_request = replace(rules.rule_request(), configuration_version="rules-v1")
+    # Model a previously stored v1 mistake; do not run the obsolete processor.
+    previous = service.process_news(
+        repository,
+        1,
+        old_request,
+        lambda *_: UnderstandingResult(
+            ContentStatus.DESCRIBED,
+            Category.TECHNOLOGY,
+            text="Synthetic previous classification",
+            evidence=("model", "release"),
+        ),
+    )
+    corrected = service.process_title_with_rules(repository, 1)
+    assert rules.rule_request().configuration_version != "rules-v1"
+    assert not corrected.reused
+    assert corrected.attempt.status is ExecutionStatus.COMPLETED
+    assert corrected.attempt.result.category is Category.UNKNOWN
+    assert corrected.attempt.result.text is None
+    assert service.process_title_with_rules(repository, 1).reused
+    assert repository.list_attempts(1)[1] == previous.attempt
