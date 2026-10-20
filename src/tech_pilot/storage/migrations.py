@@ -98,6 +98,28 @@ MIGRATIONS = (
             """,
         ),
     ),
+    Migration(
+        version=5,
+        name="create_understanding_attempts",
+        statements=(
+            """CREATE TABLE understanding_attempts (
+                id INTEGER PRIMARY KEY,
+                news_id INTEGER NOT NULL,
+                reuse_key TEXT NOT NULL,
+                snapshot_json TEXT NOT NULL,
+                request_json TEXT NOT NULL,
+                started_at TEXT NOT NULL,
+                finished_at TEXT NOT NULL,
+                status TEXT NOT NULL CHECK(status IN ('completed','failed')),
+                result_json TEXT,
+                error_code TEXT CHECK(error_code IN ('processing_failed','validation_failed')),
+                CHECK ((status='completed' AND result_json IS NOT NULL AND error_code IS NULL)
+                    OR (status='failed' AND result_json IS NULL AND error_code IS NOT NULL))
+            )""",
+            """CREATE UNIQUE INDEX understanding_completed_key
+                ON understanding_attempts(reuse_key) WHERE status='completed'""",
+        ),
+    ),
 )
 
 

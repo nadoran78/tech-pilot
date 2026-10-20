@@ -75,4 +75,5 @@ docs/decisions/0001-short-decision-title.md
 | [0004: Hugging Face RSS 수집 전송](0004-hugging-face-rss-transport.md) | Accepted | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
 | [0005: Google AI Blog RSS 수동 수집 전송](0005-google-ai-blog-rss-transport.md) | Accepted | Google AI Blog RSS의 HTTP 요청과 KST 기준 일일 요청 제한을 어떻게 처리하는가? |
 | [0006: 수집 실행 이력과 보존 정책](0006-collection-run-history.md) | Accepted | 실행 결과·중단 상태를 어떻게 기록하고 보관하는가? |
-| [0007: 설명·분류 실행·저장 결정안](0007-news-understanding-execution-storage.md) | Proposed | 첫 처리 경로·실행·저장 방식과 승인 순서는 무엇인가? |
+| [0007: 설명·분류 실행·저장 결정](0007-news-understanding-execution-storage.md) | Accepted | 첫 처리 경로·실행·저장 방식과 승인 범위는 무엇인가? |
+| [0008: 논리적 참조 무결성](0008-logical-reference-integrity.md) | Accepted | 물리적 외래키를 기본적으로 배제하고 참조를 어떻게 검증하는가? |

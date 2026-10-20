@@ -45,9 +45,9 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [뉴스 항목 계약](specs/news-item.md) | Accepted | 수집·보관할 최소 뉴스 항목과 기술적 중복 기준은 무엇인가? |
-| [요약·분류 입력·출력 제안](specs/news-understanding-input-output.md) | Draft | 현재 입력에서 어떤 설명·분류를 허용하거나 보류하는가? |
-| [요약·분류 평가 제안](specs/news-understanding-evaluation.md) | Draft | 표본·예시·검토표·통과 기준을 어떻게 설계하는가? |
-| [설명·분류 저장·재실행 제안](specs/news-understanding-storage.md) | Draft | 원본과 생성 결과를 어떻게 연결·보존·재사용하는가? |
+| [요약·분류 입력·출력 계약](specs/news-understanding-input-output.md) | Accepted | 현재 입력에서 어떤 설명·분류를 허용하거나 보류하는가? |
+| [요약·분류 평가 기준](specs/news-understanding-evaluation.md) | Accepted | 표본·예시·검토표·통과 기준은 무엇인가? |
+| [설명·분류 저장·재실행 계약](specs/news-understanding-storage.md) | Accepted | 원본과 생성 결과를 어떻게 연결·보존·재사용하는가? |
 
 ## Policies
 
@@ -79,7 +79,8 @@
 | [0004: Hugging Face RSS 수집 전송](decisions/0004-hugging-face-rss-transport.md) | Accepted | 첫 수동 RSS 수집의 HTTP 요청과 조건부 재수집을 어떻게 처리하는가? |
 | [0005: Google AI Blog RSS 수동 수집 전송](decisions/0005-google-ai-blog-rss-transport.md) | Accepted | Google AI Blog RSS의 HTTP 요청과 KST 기준 일일 요청 제한을 어떻게 처리하는가? |
 | [0006: 수집 실행 이력과 보존 정책](decisions/0006-collection-run-history.md) | Accepted | 실행 결과·중단 상태를 어떻게 기록하고 보관하는가? |
-| [0007: 설명·분류 실행·저장 결정안](decisions/0007-news-understanding-execution-storage.md) | Proposed | 첫 처리 경로·실행·저장 방식과 승인 순서는 무엇인가? |
+| [0007: 설명·분류 실행·저장 결정](decisions/0007-news-understanding-execution-storage.md) | Accepted | 첫 처리 경로·실행·저장 방식과 승인 범위는 무엇인가? |
+| [0008: 논리적 참조 무결성](decisions/0008-logical-reference-integrity.md) | Accepted | 물리적 외래키를 기본적으로 배제하고 참조를 어떻게 검증하는가? |
 
 ## Phases
 
