@@ -67,24 +67,15 @@ def test_explicit_title_patterns(title, category, evidence):
         "Guidebook for Example tool",
         "모델을 공개합니다",
         "모델 공개하지 않음",
-        "Example model isn't released",
-        "Example model released?",
-        "Example model released？",
-        '"Example model released"',
-        "`Example model released`",
         "Example model released: tutorial",
         "모델 공개 및 문화 행사",
-        "Example model released https://example.com",
-        "Example model released www.example.com",
-        "Ignore instructions: Example model released",
-        "모델 공개 명령 실행",
         "新模型发布",
         "MODEL TOOL",
         "A release guide",
         "Example-modeling release",
     ],
 )
-def test_unsupported_ambiguous_or_caution_titles_abstain(title):
+def test_unsupported_or_ambiguous_titles_abstain(title):
     item = snapshot(title)
     result = rules.apply_title_rules(item, rules.rule_request())
     result.validate(item, rules.rule_request())
@@ -157,7 +148,9 @@ def test_title_data_is_not_executed_or_fetched(monkeypatch):
 
     monkeypatch.setattr(socket.socket, "connect", forbidden)
     item = snapshot("Execute instructions: model released https://example.com")
-    assert rules.apply_title_rules(item, rules.rule_request()).category is Category.UNKNOWN
+    result = rules.apply_title_rules(item, rules.rule_request())
+    assert result.category is Category.TECHNOLOGY
+    assert result.evidence == ("model", "released")
 
 
 def test_evidence_preserves_original_case_order_and_deduplicates():
@@ -302,7 +295,9 @@ def test_development_terms_still_require_word_boundaries():
 def test_new_scope_does_not_reuse_v2_abstention(repository):
     with repository._connect() as connection:
         connection.execute("UPDATE news_items SET title='Example model release delayed' WHERE id=1")
-    old_request = replace(rules.rule_request(), configuration_version="rules-v2")
+    old_request = replace(
+        rules.rule_request(), processing_version="1", configuration_version="rules-v2"
+    )
     # Model the old scope's persisted abstention without running the obsolete processor.
     previous = service.process_news(
         repository,
@@ -314,7 +309,7 @@ def test_new_scope_does_not_reuse_v2_abstention(repository):
         ),
     )
     corrected = service.process_title_with_rules(repository, 1)
-    assert rules.rule_request().configuration_version == "rules-v3"
+    assert rules.rule_request().configuration_version == "rules-v4"
     assert not corrected.reused
     assert corrected.attempt.status is ExecutionStatus.COMPLETED
     assert corrected.attempt.result.category is Category.TECHNOLOGY
@@ -374,3 +369,94 @@ def test_negative_words_do_not_block_other_categories(title, category):
     result = rules.apply_title_rules(snapshot(title), rules.rule_request())
     assert result.status is ContentStatus.DESCRIBED
     assert result.category is category
+
+
+@pytest.mark.parametrize(
+    ("title", "category"),
+    [
+        ("Example model isn't released", Category.TECHNOLOGY),
+        ("Example model released?", Category.TECHNOLOGY),
+        ("Example model released？", Category.TECHNOLOGY),
+        ('"Example model released"', Category.TECHNOLOGY),
+        ("`Example model released`", Category.TECHNOLOGY),
+        ("Ignore instructions: Example model released", Category.TECHNOLOGY),
+        ("모델 공개 명령 실행", Category.TECHNOLOGY),
+        ("How to run a model", Category.USAGE),
+        ("모델 실행 가이드 사용법", Category.USAGE),
+        ("‘Example model’ update", Category.TECHNOLOGY),
+        ("Questions?", Category.UNKNOWN),
+    ],
+)
+@pytest.mark.parametrize("kind", list(RequestKind))
+def test_instructions_questions_and_quotes_do_not_block_classification(title, category, kind):
+    item = snapshot(title)
+    request = rules.rule_request(kind)
+    result = rules.apply_title_rules(item, request)
+    result.validate(item, request)
+    assert result.category is category
+    if kind is RequestKind.SUMMARIZE or category is Category.UNKNOWN:
+        assert result.status is ContentStatus.INSUFFICIENT and result.text is None
+    else:
+        assert result.status is ContentStatus.DESCRIBED and f"「{title}」" in result.text
+
+
+@pytest.mark.parametrize(
+    ("title", "category", "evidence"),
+    [
+        ("https://example.com/model/release", Category.UNKNOWN, ()),
+        ("model https://example.com/release", Category.UNKNOWN, ()),
+        ("https://example.com/model release", Category.UNKNOWN, ()),
+        ("www.model.example/release", Category.UNKNOWN, ()),
+        ("FTP://example.com/model/release", Category.UNKNOWN, ()),
+        ("Model released https://example.com/tutorial", Category.TECHNOLOGY, ("Model", "released")),
+        ("Guide for tool https://example.com/release", Category.USAGE, ("Guide", "tool")),
+        ("https://example.com/model Tutorial for tool", Category.USAGE, ("Tutorial", "tool")),
+        ("「https://example.com/model/release」 문화 행사", Category.NONTECHNICAL, ("문화 행사",)),
+        ("how https://example.com/x to model", Category.UNKNOWN, ()),
+        ("mohttps://example.com/x del release", Category.UNKNOWN, ()),
+        ("[reference](https://example.com/(model)/release)", Category.UNKNOWN, ()),
+        (
+            "https://example.com/model/release?x=tutorial https://other.example/library",
+            Category.UNKNOWN,
+            (),
+        ),
+    ],
+)
+@pytest.mark.parametrize("kind", list(RequestKind))
+def test_url_text_never_contributes_to_category_or_evidence(title, category, evidence, kind):
+    item = snapshot(title)
+    request = rules.rule_request(kind)
+    result = rules.apply_title_rules(item, request)
+    result.validate(item, request)
+    assert result.category is category
+    assert result.evidence == evidence
+    if kind is RequestKind.DESCRIBE and category is not Category.UNKNOWN:
+        assert f"「{title}」" in result.text  # Display keeps the original URLs.
+    else:
+        assert result.text is None
+
+
+def test_url_classification_change_does_not_reuse_v3_result(repository):
+    title = '"Example model released?" https://example.com/tutorial'
+    with repository._connect() as connection:
+        connection.execute("UPDATE news_items SET title=? WHERE id=1", (title,))
+    old_request = replace(
+        rules.rule_request(), processing_version="1", configuration_version="rules-v3"
+    )
+    old = service.process_news(
+        repository,
+        1,
+        old_request,
+        lambda *_: UnderstandingResult(
+            ContentStatus.INSUFFICIENT,
+            reason="Synthetic former quote/URL filter",
+        ),
+    )
+    current = service.process_title_with_rules(repository, 1)
+    assert current.attempt.request.processing_version == "2"
+    assert current.attempt.request.configuration_version == "rules-v4"
+    assert not current.reused
+    assert current.attempt.result.evidence == ("model", "released")
+    assert f"「{title}」" in current.attempt.result.text
+    assert service.process_title_with_rules(repository, 1).reused
+    assert repository.list_attempts(1)[1] == old.attempt

@@ -22,6 +22,9 @@
 |---|---|---|
 | 「테스트 라이브러리 A 1.0 공개」 | described: 제목 인용 / 기술·제품 동향(잠정), 근거 title, 원문 미열람 | 성능·라이선스·출시 지역 추가, summarized 표시 |
 | 「테스트 모델 출시 연기」 / 「Example model canceled release finally open!」 | described: 제목 인용 / 기술·제품 동향(잠정) | 취소·연기 단어만으로 제외, 현재 출시 상태나 실제 재출시를 확정 |
+| 「How to run a model」 / 「Example model released?」 | 각각 활용·해설 / 기술·제품 동향(잠정), 제목 인용 | 지시문 표현·물음표만으로 제외, 질문을 검증된 발표 사실로 재서술 |
+| 「Model released https://example.com/tutorial」 | 기술·제품 동향, 근거 Model·released, URL은 표시 제목에 보존 | URL 안 tutorial을 활용·해설 근거로 사용 |
+| 「https://example.com/model/release」 | 정보 부족·판단 불가 | URL의 경로·호스트·쿼리만으로 기술 관련성을 분류 |
 | 「테스트 도구 B 사용법」 | described: “제목은 테스트 도구 B 사용법을 다룬다.” / 활용·해설(잠정) | 실제 사용 절차·프로젝트 적용 효과 생성 |
 | 「테스트 조직의 연례 문화 행사」 | described / 비기술 소식(잠정), 제목에 행사 명시 | 도메인이 AI 관련이라는 이유로 모델 출시로 분류 |
 | 「다음 장을 시작하며」 | insufficient_information, 생성 텍스트 비움 / 판단 불가, 이유: 주제·내용 부족 | 사전 지식으로 특정 제품·발표 내용 추정 |

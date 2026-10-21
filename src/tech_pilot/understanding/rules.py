@@ -13,8 +13,8 @@ from tech_pilot.understanding.models import (
 )
 
 METHOD = "title-rules"
-PROCESSING_VERSION = "1"
-RULESET_VERSION = "rules-v3"
+PROCESSING_VERSION = "2"
+RULESET_VERSION = "rules-v4"
 
 
 def _terms(*terms: str) -> re.Pattern[str]:
@@ -77,15 +77,8 @@ _NONTECHNICAL = _terms(
     "hiring update",
     "leadership appointment",
 )
-_INSTRUCTION_EN = _terms(
-    "ignore",
-    "instruction",
-    "instructions",
-    "execute",
-    "run",
-)
-_INSTRUCTION_KO = re.compile("무시|명령|실행")
-_QUOTES_URL_QUESTION = re.compile(r"""[?？"'`“”‘’「」『』]|https?://|www\.""", re.I)
+# Mask URL spans rather than joining the surrounding words or changing source offsets.
+_URL = re.compile(r"""(?:[a-z][a-z0-9+.-]*://|www\.)[^\s<>"'“”‘’「」『』`]+""", re.I)
 _LABELS = {
     Category.TECHNOLOGY: "기술·제품 동향",
     Category.USAGE: "활용·해설",
@@ -98,12 +91,14 @@ def rule_request(kind: RequestKind = RequestKind.DESCRIBE) -> ProcessingRequest:
     return ProcessingRequest(kind, METHOD, PROCESSING_VERSION, RULESET_VERSION)
 
 
-def _evidence(title: str, patterns: tuple[re.Pattern[str], ...]) -> tuple[str, ...]:
+def _evidence(
+    title: str, classification_text: str, patterns: tuple[re.Pattern[str], ...]
+) -> tuple[str, ...]:
     matches = sorted(
-        (match for pattern in patterns for match in pattern.finditer(title)),
+        (match for pattern in patterns for match in pattern.finditer(classification_text)),
         key=lambda match: (match.start(), match.end()),
     )
-    return tuple(dict.fromkeys(match.group() for match in matches))
+    return tuple(dict.fromkeys(title[match.start() : match.end()] for match in matches))
 
 
 def apply_title_rules(snapshot: InputSnapshot, request: ProcessingRequest) -> UnderstandingResult:
@@ -119,23 +114,20 @@ def apply_title_rules(snapshot: InputSnapshot, request: ProcessingRequest) -> Un
         )
     ):
         return UnderstandingResult(ContentStatus.DEFERRED, reason="처리할 수 없는 제목 형식")
-    if (
-        _INSTRUCTION_EN.search(title)
-        or _INSTRUCTION_KO.search(title)
-        or _QUOTES_URL_QUESTION.search(title)
-    ):
-        return UnderstandingResult(
-            ContentStatus.INSUFFICIENT, reason="의문·인용·URL·지시문으로 제목 판단 보류"
-        )
+    classification_text = _URL.sub(lambda match: " " * len(match.group()), title)
 
     candidates: dict[Category, tuple[str, ...]] = {}
-    if _TECHNOLOGY.search(title):
-        if _DEVELOPMENT.search(title):
-            candidates[Category.TECHNOLOGY] = _evidence(title, (_TECHNOLOGY, _DEVELOPMENT))
-        if _USAGE.search(title):
-            candidates[Category.USAGE] = _evidence(title, (_TECHNOLOGY, _USAGE))
-    if _NONTECHNICAL.search(title):
-        candidates[Category.NONTECHNICAL] = _evidence(title, (_NONTECHNICAL,))
+    if _TECHNOLOGY.search(classification_text):
+        if _DEVELOPMENT.search(classification_text):
+            candidates[Category.TECHNOLOGY] = _evidence(
+                title, classification_text, (_TECHNOLOGY, _DEVELOPMENT)
+            )
+        if _USAGE.search(classification_text):
+            candidates[Category.USAGE] = _evidence(
+                title, classification_text, (_TECHNOLOGY, _USAGE)
+            )
+    if _NONTECHNICAL.search(classification_text):
+        candidates[Category.NONTECHNICAL] = _evidence(title, classification_text, (_NONTECHNICAL,))
 
     category = Category.UNKNOWN
     evidence: tuple[str, ...] = ()
