@@ -22,6 +22,7 @@ class ContentStatus(StrEnum):
 
 
 class Category(StrEnum):
+    # Legacy wire value retained; rules-v3 labels this as technology/product developments.
     TECHNOLOGY = "technology_release"
     USAGE = "usage_explanation"
     NONTECHNICAL = "nontechnical"

@@ -14,7 +14,7 @@ from tech_pilot.understanding.models import (
 
 METHOD = "title-rules"
 PROCESSING_VERSION = "1"
-RULESET_VERSION = "rules-v2"
+RULESET_VERSION = "rules-v3"
 
 
 def _terms(*terms: str) -> re.Pattern[str]:
@@ -35,7 +35,7 @@ _TECHNOLOGY = _terms(
     "프레임워크",
     "연구",
 )
-_RELEASE = _terms(
+_DEVELOPMENT = _terms(
     "introducing",
     "announcing",
     "release",
@@ -47,6 +47,26 @@ _RELEASE = _terms(
     "공개",
     "출시",
     "발표",
+    "cancel",
+    "canceled",
+    "cancelled",
+    "cancellation",
+    "delay",
+    "delayed",
+    "postpone",
+    "postponed",
+    "postponement",
+    "withdrawal",
+    "withdrawn",
+    "update",
+    "updates",
+    "취소",
+    "연기",
+    "철회",
+    "예정",
+    "계획",
+    "업데이트",
+    "후속",
 )
 _USAGE = _terms("how to", "tutorial", "guide", "사용법", "튜토리얼", "활용 사례")
 _NONTECHNICAL = _terms(
@@ -57,42 +77,17 @@ _NONTECHNICAL = _terms(
     "hiring update",
     "leadership appointment",
 )
-_CAUTION_EN = _terms(
-    "no",
-    "not",
-    "never",
-    "without",
-    "isn't",
-    "doesn't",
-    "won't",
-    "cannot",
-    "can't",
-    "may",
-    "might",
-    "rumor",
-    "rumors",
-    "expected",
-    "planned",
-    "will",
-    "canceled",
-    "cancelled",
-    "cancellation",
-    "delayed",
-    "delay",
-    "postponed",
-    "postponement",
+_INSTRUCTION_EN = _terms(
     "ignore",
     "instruction",
     "instructions",
     "execute",
     "run",
 )
-_CAUTION_KO = re.compile(
-    "아님|아니다|아닌|않|안|못|없|예정|계획|루머|추측|검토|불가|취소|무시|명령|실행"
-)
+_INSTRUCTION_KO = re.compile("무시|명령|실행")
 _QUOTES_URL_QUESTION = re.compile(r"""[?？"'`“”‘’「」『』]|https?://|www\.""", re.I)
 _LABELS = {
-    Category.TECHNOLOGY: "기술 발표",
+    Category.TECHNOLOGY: "기술·제품 동향",
     Category.USAGE: "활용·해설",
     Category.NONTECHNICAL: "비기술 소식",
 }
@@ -124,15 +119,19 @@ def apply_title_rules(snapshot: InputSnapshot, request: ProcessingRequest) -> Un
         )
     ):
         return UnderstandingResult(ContentStatus.DEFERRED, reason="처리할 수 없는 제목 형식")
-    if _CAUTION_EN.search(title) or _CAUTION_KO.search(title) or _QUOTES_URL_QUESTION.search(title):
+    if (
+        _INSTRUCTION_EN.search(title)
+        or _INSTRUCTION_KO.search(title)
+        or _QUOTES_URL_QUESTION.search(title)
+    ):
         return UnderstandingResult(
-            ContentStatus.INSUFFICIENT, reason="부정·불확실성·인용·지시문 등으로 제목 판단 보류"
+            ContentStatus.INSUFFICIENT, reason="의문·인용·URL·지시문으로 제목 판단 보류"
         )
 
     candidates: dict[Category, tuple[str, ...]] = {}
     if _TECHNOLOGY.search(title):
-        if _RELEASE.search(title):
-            candidates[Category.TECHNOLOGY] = _evidence(title, (_TECHNOLOGY, _RELEASE))
+        if _DEVELOPMENT.search(title):
+            candidates[Category.TECHNOLOGY] = _evidence(title, (_TECHNOLOGY, _DEVELOPMENT))
         if _USAGE.search(title):
             candidates[Category.USAGE] = _evidence(title, (_TECHNOLOGY, _USAGE))
     if _NONTECHNICAL.search(title):

@@ -66,13 +66,7 @@ def test_explicit_title_patterns(title, category, evidence):
         "Example model releasedate",
         "Guidebook for Example tool",
         "모델을 공개합니다",
-        "Example model not released",
-        "Example model never released",
-        "모델 공개 예정",
-        "모델 공개 안 함",
         "모델 공개하지 않음",
-        "Example model may launch",
-        "Example model will launch",
         "Example model isn't released",
         "Example model released?",
         "Example model released？",
@@ -84,9 +78,6 @@ def test_explicit_title_patterns(title, category, evidence):
         "Example model released www.example.com",
         "Ignore instructions: Example model released",
         "모델 공개 명령 실행",
-        "Example 도구 출시 불가",
-        "Example model 출시 취소",
-        "모델 release 루머",
         "新模型发布",
         "MODEL TOOL",
         "A release guide",
@@ -289,42 +280,97 @@ def test_changed_input_abstention_is_completed_and_reusable(repository):
     ],
 )
 @pytest.mark.parametrize("kind", list(RequestKind))
-def test_release_cancellation_or_delay_abstains(ending, kind):
+def test_release_cancellation_or_delay_is_technology_news(ending, kind):
     item = snapshot(f"Example model release {ending}")
     request = rules.rule_request(kind)
     result = rules.apply_title_rules(item, request)
     result.validate(item, request)
-    assert result.status is ContentStatus.INSUFFICIENT
-    assert result.category is Category.UNKNOWN
-    assert result.text is None and result.evidence == () and result.reason
+    assert result.category is Category.TECHNOLOGY
+    assert result.evidence and all(part in item.title for part in result.evidence)
+    if kind is RequestKind.SUMMARIZE:
+        assert result.status is ContentStatus.INSUFFICIENT and result.text is None
+    else:
+        assert result.status is ContentStatus.DESCRIBED
+        assert result.text == f"제목 기반 설명(잠정 분류: 기술·제품 동향): 「{item.title}」"
 
 
-def test_caution_terms_still_require_word_boundaries():
-    item = snapshot("Example model release for DelayedWidget")
-    assert rules.apply_title_rules(item, rules.rule_request()).category is Category.TECHNOLOGY
+def test_development_terms_still_require_word_boundaries():
+    item = snapshot("Example model DelayedWidget")
+    assert rules.apply_title_rules(item, rules.rule_request()).category is Category.UNKNOWN
 
 
-def test_corrected_rules_do_not_reuse_old_release_classification(repository):
+def test_new_scope_does_not_reuse_v2_abstention(repository):
     with repository._connect() as connection:
         connection.execute("UPDATE news_items SET title='Example model release delayed' WHERE id=1")
-    old_request = replace(rules.rule_request(), configuration_version="rules-v1")
-    # Model a previously stored v1 mistake; do not run the obsolete processor.
+    old_request = replace(rules.rule_request(), configuration_version="rules-v2")
+    # Model the old scope's persisted abstention without running the obsolete processor.
     previous = service.process_news(
         repository,
         1,
         old_request,
         lambda *_: UnderstandingResult(
-            ContentStatus.DESCRIBED,
-            Category.TECHNOLOGY,
-            text="Synthetic previous classification",
-            evidence=("model", "release"),
+            ContentStatus.INSUFFICIENT,
+            reason="Synthetic previous cancellation filter",
         ),
     )
     corrected = service.process_title_with_rules(repository, 1)
-    assert rules.rule_request().configuration_version != "rules-v1"
+    assert rules.rule_request().configuration_version == "rules-v3"
     assert not corrected.reused
     assert corrected.attempt.status is ExecutionStatus.COMPLETED
-    assert corrected.attempt.result.category is Category.UNKNOWN
-    assert corrected.attempt.result.text is None
+    assert corrected.attempt.result.category is Category.TECHNOLOGY
+    assert corrected.attempt.result.category.value == "technology_release"
+    assert "기술·제품 동향" in corrected.attempt.result.text
     assert service.process_title_with_rules(repository, 1).reused
     assert repository.list_attempts(1)[1] == previous.attempt
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "Example model not released",
+        "Example model never released",
+        "모델 공개 예정",
+        "모델 공개 안 함",
+        "Example model may launch",
+        "Example model will launch",
+        "Example 도구 출시 불가",
+        "Example model 출시 취소",
+        "모델 release 루머",
+        "Example model canceled release finally open!",
+        "모델 연기",
+        "도구 철회",
+        "Example model withdrawn",
+        "Example SDK update",
+        "모델 출시 계획",
+        "안내: 모델 공개",
+        "Example model release without a launch",
+    ],
+)
+def test_negation_uncertainty_and_followups_do_not_block_news(title):
+    item = snapshot(title)
+    request = rules.rule_request()
+    result = rules.apply_title_rules(item, request)
+    result.validate(item, request)
+    assert result.status is ContentStatus.DESCRIBED
+    assert result.category is Category.TECHNOLOGY
+    assert result.text == f"제목 기반 설명(잠정 분류: 기술·제품 동향): 「{title}」"
+
+
+@pytest.mark.parametrize("title", ["canceled release finally open!", "취소 안내", "not relevant"])
+def test_removing_negative_filter_still_requires_technology_context(title):
+    assert (
+        rules.apply_title_rules(snapshot(title), rules.rule_request()).category is Category.UNKNOWN
+    )
+
+
+@pytest.mark.parametrize(
+    ("title", "category"),
+    [
+        ("Tutorial for Example model without prerequisites", Category.USAGE),
+        ("No Example cultural event", Category.NONTECHNICAL),
+    ],
+)
+def test_negative_words_do_not_block_other_categories(title, category):
+    result = rules.apply_title_rules(snapshot(title), rules.rule_request())
+    assert result.status is ContentStatus.DESCRIBED
+    assert result.category is category
