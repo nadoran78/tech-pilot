@@ -4,7 +4,7 @@ Tech Pilot은 새롭게 등장하는 AI 기술을 지속적으로 파악하고, 
 
 ## Current Status
 
-현재는 **4단계: 요약·분류 및 의미 기반 통합**을 진행하고 있다. 사용자가 2026-10-15에 단계 전환을 승인했고, 2026-10-18에 제목 기반 입력·출력, 평가 기준과 [ADR 0007](docs/decisions/0007-news-understanding-execution-storage.md)의 실행·저장·재실행안을 승인했다. 저장 기반에 이어 [네트워크 없는 제목 규칙 기준선](docs/specs/news-understanding-rules.md)을 구현했다. 수동 실행·조회 CLI와 실제 표본 품질 평가는 후속 작업이다. 모델·비용·유료 API·자동화·블로그 작성은 별도 결정·승인 대상이다.
+현재는 **4단계: 요약·분류 및 의미 기반 통합**을 진행하고 있다. 사용자가 2026-10-15에 단계 전환을 승인했고, 2026-10-18에 제목 기반 입력·출력, 평가 기준과 [ADR 0007](docs/decisions/0007-news-understanding-execution-storage.md)의 실행·저장·재실행안을 승인했다. 저장 기반과 [네트워크 없는 제목 규칙 기준선](docs/specs/news-understanding-rules.md)에 이어 [한 건 수동 실행·조회 CLI](docs/runbooks/news-understanding.md)를 구현했다. 실제 표본 품질 평가는 후속 작업이다. 모델·비용·유료 API·자동화·블로그 작성은 별도 결정·승인 대상이다.
 
 - 프로젝트의 배경과 목표: [제품 비전](docs/product/vision.md)
 - 전체 개발 단계: [제품 로드맵](docs/product/roadmap.md)

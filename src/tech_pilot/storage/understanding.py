@@ -2,6 +2,7 @@
 
 import json
 import sqlite3
+from contextlib import closing
 from dataclasses import asdict
 from datetime import UTC, datetime
 
@@ -24,6 +25,40 @@ from tech_pilot.understanding.models import (
 
 class SQLiteUnderstandingRepository(SQLiteNewsRepository):
     """One manual processor at a time; completed results are reused by exact key."""
+
+    def read_history(
+        self, news_id: int, *, limit: int = 10
+    ) -> tuple[InputSnapshot | None, tuple[StoredAttempt, ...]]:
+        """Read one consistent snapshot without creating a DB or applying migrations."""
+        if (
+            type(news_id) is not int
+            or not 1 <= news_id <= 2**63 - 1
+            or type(limit) is not int
+            or not 1 <= limit <= 2**63 - 1
+        ):
+            raise ValueError("positive news id and limit required")
+        if not self._database_path.exists():
+            return None, ()
+        uri = self._database_path.resolve().as_uri() + "?mode=ro"
+        with closing(sqlite3.connect(uri, uri=True)) as connection:
+            connection.row_factory = sqlite3.Row
+            connection.execute("BEGIN")
+            original = connection.execute(
+                "SELECT * FROM news_items WHERE id=?", (news_id,)
+            ).fetchone()
+            snapshot = (
+                InputSnapshot.from_news(_stored_item_from_row(original)) if original else None
+            )
+            has_attempts = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='understanding_attempts'"
+            ).fetchone()
+            if not has_attempts:
+                return snapshot, ()
+            rows = connection.execute(
+                "SELECT * FROM understanding_attempts WHERE news_id=? ORDER BY id DESC LIMIT ?",
+                (news_id, limit),
+            ).fetchall()
+            return snapshot, tuple(_decode(row) for row in rows)
 
     def completed(self, key: str) -> StoredAttempt | None:
         with self._connect() as connection:

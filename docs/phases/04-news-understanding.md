@@ -14,7 +14,7 @@
 
 ## 첫 범위 제안
 
-2026-10-18 사용자가 제목 기반 입력·출력안, 평가 기준, ADR 0007의 실행·저장·재실행안을 명시적으로 승인했다. Issue #67 / PR #68에서 모델 없는 저장 기반을 구현했고, Issue #69에서 [제목 규칙 기준선](../specs/news-understanding-rules.md)과 저장 연동을 구현한다. 수동 실행·조회 CLI와 실제 뉴스 12개 표본 평가는 후속 이슈다.
+2026-10-18 사용자가 제목 기반 입력·출력안, 평가 기준, ADR 0007의 실행·저장·재실행안을 명시적으로 승인했다. Issue #67 / PR #68에서 저장 기반, Issue #69 / PR #70에서 [제목 규칙 기준선](../specs/news-understanding-rules.md)을 구현했다. Issue #71에서 [한 건 수동 실행·조회 CLI](../runbooks/news-understanding.md)를 구현하며 실제 뉴스 12개 표본 평가는 후속 이슈다.
 
 Issue #63에서 분리한 [입력·출력 계약](../specs/news-understanding-input-output.md)과 [평가 기준](../specs/news-understanding-evaluation.md)은 Accepted다. 설계 승인은 실제 평가 통과나 4단계 완료를 의미하지 않는다. 아래는 단계 전체의 방향이며 상세 기준은 연결 문서를 따른다.
 
@@ -46,7 +46,7 @@ Issue #63에서 분리한 [입력·출력 계약](../specs/news-understanding-in
 
 ## 미결정 사항과 다음 이슈 순서
 
-Issue #65의 [ADR 0007](../decisions/0007-news-understanding-execution-storage.md)과 [저장·재실행 계약](../specs/news-understanding-storage.md)은 2026-10-18 Accepted로 전환했다. Issue #67은 가짜 처리기로 저장·재사용·실패 경계를 검증했고, Issue #69는 실제 규칙 처리기를 합성 사례·임시 DB로 검증한다. 모델 실행 승인은 포함하지 않는다. 다음 순서는 수동 실행·조회 CLI → 승인된 기준에 따른 실제 표본 평가이며, 합성 테스트 통과를 품질 합격으로 취급하지 않는다.
+Issue #65의 [ADR 0007](../decisions/0007-news-understanding-execution-storage.md)과 [저장·재실행 계약](../specs/news-understanding-storage.md)은 2026-10-18 Accepted로 전환했다. Issue #67은 저장 경계, Issue #69는 실제 규칙 처리기, Issue #71은 수동 실행·조회 CLI를 합성 사례·임시 DB로 검증한다. 모델 실행 승인은 포함하지 않는다. 다음은 승인된 기준에 따른 실제 표본 평가이며, 합성 테스트 통과를 품질 합격으로 취급하지 않는다.
 
 1. **입력·평가 설계:** 표본·내용 충분성·원문과 제목 수준 처리 구분·부족 시 처리·평가 기준.
 2. **기술·저장 결정:** 로컬/외부 모델·의존성·비용 상한·개인정보와 외부 전송·생성 결과 저장·재실행 계약. 중요한 선택은 ADR로 제안한다.
@@ -55,4 +55,4 @@ Issue #65의 [ADR 0007](../decisions/0007-news-understanding-execution-storage.m
 
 ## 현재 제외 범위
 
-현재 Issue #69에는 CLI·모델 확정·API 호출·추가 수집·운영 DB 변경·실제 뉴스 품질 평가를 포함하지 않는다. 자동화·무인 실행은 별도 정책·운영 결정 대상이다. Obsidian/Quartz 글 작성·경로 복사는 선택적 확장으로 보류하고 현재 연동 문서를 만들지 않는다. 개인 영향·학습 우선순위·수익화 평가도 아직 활성화하지 않는다.
+현재 Issue #71에는 일괄 처리·새 규칙·모델 확정·API 호출·추가 수집·운영 DB 실행·실제 뉴스 품질 평가·삭제/정리를 포함하지 않는다. 자동화·무인 실행은 별도 정책·운영 결정 대상이다. Obsidian/Quartz 글 작성·경로 복사는 선택적 확장으로 보류하고 현재 연동 문서를 만들지 않는다. 개인 영향·학습 우선순위·수익화 평가도 아직 활성화하지 않는다.

@@ -73,3 +73,7 @@ Issue #67의 임시 DB·가짜 처리기 테스트로 같은 키 재사용·변�
 ## 규칙 처리기 연동 (Issue #69)
 
 [제목 규칙 기준선](news-understanding-rules.md)의 `rule_request`와 `apply_title_rules`를 `process_title_with_rules`로 연결한다. 기존 `process_news`의 원본 검증·저장·키 재사용·안전한 오류 경계를 그대로 사용하며 새 migration이나 저장 필드를 추가하지 않는다. 규칙이 정상적으로 판단 불가를 반환하면 completed 결과로 재사용한다. 규칙 버전이 바뀌면 새 키로 저장하고 기존 결과를 보존한다. 검증은 [규칙·저장 연동 테스트](../../tests/test_title_rules.py)를 따르며 CLI·운영 DB·실제 뉴스 평가는 포함하지 않는다.
+
+## 읽기 전용 이력 조회 (Issue #71)
+
+`SQLiteUnderstandingRepository.read_history(news_id, limit=10)`은 SQLite URI `mode=ro`로 연결해 원본 스냅샷과 ID 내림차순 이력을 같은 읽기 트랜잭션에서 반환한다. LIMIT은 SQL에 적용하고 조회 연결을 닫는다. 없는 DB는 만들지 않으며 기존 결과 테이블이 없으면 이력을 비워 반환한다. 조회 경로는 기존 쓰기 API와 달리 migration을 적용하지 않는다. CLI 출력·종료 코드·현재/과거 구분 기준은 [수동 운영 문서](../runbooks/news-understanding.md)를 따른다. 새 schema·migration은 없다.

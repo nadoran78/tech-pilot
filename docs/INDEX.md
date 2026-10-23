@@ -69,6 +69,7 @@
 | 문서 | 상태 | 답하는 질문 |
 |---|---|---|
 | [뉴스 수집 수동 운영](runbooks/news-collection.md) | Active | 승인된 RSS 출처를 수동 수집·조회하고 결과를 점검하는 방법은 무엇인가? |
+| [뉴스 제목 설명·분류 수동 운영](runbooks/news-understanding.md) | Active | 저장 뉴스 한 건을 처리·재사용하고 현재/과거 이력을 조회하는 방법은 무엇인가? |
 | [2026-10-10 첫 수집 품질 검토](runbooks/2026-10-10-news-quality-review.md) | Accepted | 첫 실제 다중 출처 수집의 결과·품질·한계와 다음 개선 후보는 무엇인가? |
 | [2026-10-11 실행 이력 운영 검증](runbooks/2026-10-11-history-runtime-verification.md) | Accepted | 실제 수집 결과와 실행 이력·조회는 일치하며 기존 DB는 보존되는가? |
 
