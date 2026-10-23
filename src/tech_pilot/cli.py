@@ -21,6 +21,7 @@ from tech_pilot.collection.coordinator import collect_sources
 from tech_pilot.collection.registry import APPROVED_SOURCES
 from tech_pilot.storage import SQLiteNewsRepository
 from tech_pilot.storage.history import SQLiteRunHistory
+from tech_pilot.understanding.console import show_understanding_history, understand_one
 
 DEFAULT_DATABASE_PATH = Path("data/tech-pilot.sqlite3")
 DEFAULT_LIST_LIMIT = 20
@@ -72,6 +73,39 @@ def build_parser() -> argparse.ArgumentParser:
     history_parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE_PATH)
     history_parser.add_argument("--source", choices=source_ids)
     history_parser.add_argument("--limit", type=_positive_int, default=20)
+    understand_parser = subparsers.add_parser(
+        "understand", help="뉴스 한 건의 제목을 설명·분류합니다."
+    )
+    understand_parser.add_argument(
+        "--news-id",
+        type=_sqlite_positive_int,
+        required=True,
+        help="처리할 저장 뉴스 ID (양의 정수)",
+    )
+    understand_parser.add_argument(
+        "--database",
+        type=Path,
+        default=DEFAULT_DATABASE_PATH,
+        help="SQLite 경로 (기본값: data/tech-pilot.sqlite3)",
+    )
+    understanding_history = subparsers.add_parser(
+        "understanding-history", help="뉴스 한 건의 설명·분류 처리 이력을 조회합니다."
+    )
+    understanding_history.add_argument(
+        "--news-id",
+        type=_sqlite_positive_int,
+        required=True,
+        help="조회할 저장 뉴스 ID (양의 정수)",
+    )
+    understanding_history.add_argument(
+        "--limit", type=_sqlite_positive_int, default=10, help="표시할 최대 이력 수 (기본값: 10)"
+    )
+    understanding_history.add_argument(
+        "--database",
+        type=Path,
+        default=DEFAULT_DATABASE_PATH,
+        help="읽기 전용 SQLite 경로 (기본값: data/tech-pilot.sqlite3)",
+    )
     return parser
 
 
@@ -83,6 +117,10 @@ def main(argv: Sequence[str] | None = None, *, stdout: TextIO | None = None) -> 
         return 0
 
     output = stdout if stdout is not None else sys.stdout
+    if args.command == "understand":
+        return understand_one(args.database, args.news_id, output)
+    if args.command == "understanding-history":
+        return show_understanding_history(args.database, args.news_id, args.limit, output)
     if args.command == "history":
         try:
             runs = (
@@ -192,6 +230,13 @@ def _positive_int(value: str) -> int:
         raise argparse.ArgumentTypeError("양의 정수를 입력해야 합니다.") from error
     if integer < 1:
         raise argparse.ArgumentTypeError("양의 정수를 입력해야 합니다.")
+    return integer
+
+
+def _sqlite_positive_int(value: str) -> int:
+    integer = _positive_int(value)
+    if integer > 2**63 - 1:
+        raise argparse.ArgumentTypeError("SQLite 정수 범위의 양수를 입력하세요.")
     return integer
 
 
