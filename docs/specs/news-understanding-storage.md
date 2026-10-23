@@ -69,3 +69,7 @@ Issue #67의 임시 DB·가짜 처리기 테스트로 같은 키 재사용·변�
 - [처리 서비스](../../src/tech_pilot/understanding/service.py) `process_news`는 주입한 처리기를 최대 1회 호출한다. 참조 오류는 `InputRejected`, 저장 실패는 `UnderstandingStorageError`로 구분한다. 처리 예외는 `processing_failed`, 결과 구조 오류는 `validation_failed`로 기록하며 원시 예외는 보관하지 않는다. 강제 종료는 기록이 없을 수 있다.
 - 원문 요약 요청에 설명 결과를 반환하거나 title에 없는 근거 문자열을 사용하면 검증 실패다. 설명 텍스트의 의미·분류의 정확성은 구조 검사만으로 보장하지 않으며 사람 평가 대상이다. 실제 규칙·CLI·표본 평가는 포함하지 않는다.
 - 검증 진입점: [계약·실행·저장 테스트](../../tests/test_understanding.py), [기존 migration 회귀 테스트](../../tests/test_news_repository.py).
+
+## 규칙 처리기 연동 (Issue #69)
+
+[제목 규칙 기준선](news-understanding-rules.md)의 `rule_request`와 `apply_title_rules`를 `process_title_with_rules`로 연결한다. 기존 `process_news`의 원본 검증·저장·키 재사용·안전한 오류 경계를 그대로 사용하며 새 migration이나 저장 필드를 추가하지 않는다. 규칙이 정상적으로 판단 불가를 반환하면 completed 결과로 재사용한다. 규칙 버전이 바뀌면 새 키로 저장하고 기존 결과를 보존한다. 검증은 [규칙·저장 연동 테스트](../../tests/test_title_rules.py)를 따르며 CLI·운영 DB·실제 뉴스 평가는 포함하지 않는다.

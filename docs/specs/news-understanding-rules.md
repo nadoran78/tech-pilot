@@ -1,0 +1,58 @@
+# 제목 기반 설명·분류 규칙 기준선
+
+- **Status:** Active
+- **Applies to:** Phase 4, Issue #69
+- **Purpose:** 네트워크 없는 첫 규칙 처리기의 지원 표현·보류·표시·버전을 정의한다.
+- **Read when:** 규칙 처리기를 구현·검토하거나 후속 평가를 준비할 때
+- **Related documents:** [ADR 0007](../decisions/0007-news-understanding-execution-storage.md), [입력·출력 계약](news-understanding-input-output.md), [평가 기준](news-understanding-evaluation.md), [저장 계약](news-understanding-storage.md)
+
+## 적용 범위
+
+2026-10-20 사용자가 규칙 기준선 구현 계획과 Issue·PR 발행을 승인했다. v1·v2 이후 2026-10-21 소식 갈무리 목적의 v3 범주 확장을 승인했고, 같은 날 후속 요청으로 지시문·물음표·따옴표 일괄 보류도 제거해 현재는 v4다. [범주 정의](news-understanding-input-output.md#분류-범주)에 따라 취소·부정·불확실성 단어만으로 보류하지 않는다. 제목의 URL은 분류 근거에서만 제외한다. 실제 뉴스 품질 검토를 통과했다는 기록은 아니다. 한국어·영어의 제한된 표현만 지원하며 번역·원문 접근·사전 지식 보충은 하지 않는다.
+
+## 규칙표와 우선순위
+
+1. 빈 제목·줄바꿈/제어문자·2,000자 초과 입력은 `deferred` + 판단 불가, 생성 텍스트 없이 고정 사유를 반환한다. 원본 참조 검증은 별도로 기존 서비스·저장소가 담당한다.
+2. 제목의 URL 구간을 같은 길이의 공백으로 마스킹한 임시 텍스트에서만 범주와 근거를 찾는다. 원본 제목·스냅샷·출력 제목 인용은 변경하지 않는다. 지시문·물음표·따옴표나 취소·부정·불확실성 때문에 제목 전체를 보류하지 않는다. 제목을 실행하거나 URL을 여는 코드는 없으며, 문자열 필터를 보안 경계로 취급하지 않는다.
+3. 아래 범주 중 정확히 하나만 일치하면 설명·잠정 분류한다. 0개 또는 2개 이상이면 정보 부족·판단 불가로 남긴다. 규칙 순서로 충돌을 덮지 않는다.
+4. 원문 요약 요청은 항상 생성 텍스트 없이 `insufficient_information`이다. 손상 입력은 1번을 우선한다. 명확한 제목의 잠정 분류·근거는 유지할 수 있지만 내용 요약으로 사용하지 않는다.
+
+| 범주 | 필요한 제목 표현(대소문자 무시, 아래 한정 어휘) |
+|---|---|
+| 기술·제품 동향 | 기술 대상 **및** 동향 신호가 함께 존재. 출시 여부를 판정하지 않음 |
+| 활용·해설 | 기술 대상 **및** 사용법 신호가 함께 존재 |
+| 비기술 소식 | `문화 행사`, `채용 소식`, `인사 소식`, `cultural event`, `hiring update`, `leadership appointment` 중 하나 |
+
+- 기술 대상: `model`, `tool`, `library`, `framework`, `sdk`, `research`, `모델`, `도구`, `라이브러리`, `프레임워크`, `연구`.
+- 동향 신호: `introducing`, `announcing`, `release`, `releases`, `released`, `launch`, `launches`, `launched`, `공개`, `출시`, `발표`, `cancel`, `canceled`, `cancelled`, `cancellation`, `delay`, `delayed`, `postpone`, `postponed`, `postponement`, `withdrawal`, `withdrawn`, `update`, `updates`, `취소`, `연기`, `철회`, `예정`, `계획`, `업데이트`, `후속`.
+- 사용법 신호: `how to`, `tutorial`, `guide`, `사용법`, `튜토리얼`, `활용 사례`.
+- URL 인식 범위: `http://`, `https://`, `ftp://` 등 영문 scheme의 `://` 형태와 `www.` 시작 주소(대소문자 무시). 공백·꺾쇠·따옴표·백틱 직전까지를 URL 구간으로 본다. 괄호·쿼리는 URL 구간에 포함한다. scheme/`www.` 없는 주소나 공백으로 깨진 URL은 인식하지 못할 수 있고, URL과 붙은 일반 문구는 함께 마스킹될 수 있다. 범용 URL 파서가 아니며 주소를 디코딩·요청하지 않는다.
+- 영어 어휘는 Unicode 단어 경계를 확인해 `modeling`, `releasedate`, `guidebook` 등의 부분 문자열을 일치시키지 않는다. 여러 단어 표현은 공백 하나로만 지원하며 URL을 삭제해 양옆 단어를 이어 붙이지 않는다. 한국어 대상·동향 신호도 단어 경계를 요구하므로 `모델을`, `공개합니다` 등 조사·활용형은 현재 인식하지 않는다. `모델 공개하지 않음`은 부정 차단이 아니라 지원 동향 표현과 일치하지 않아 판단 불가다.
+
+## 출력과 합성 예시
+
+설명은 `제목 기반 설명(잠정 분류: <범주>): 「<제목 그대로>」` 형식이다. 한국어 범주 표시는 `기술·제품 동향`, `활용·해설`, `비기술 소식`이며 `limitation`은 항상 `원문 미열람`이다. 제목을 번역·축약하거나 검증된 발표 사실로 단정하지 않는다. 근거는 URL 밖에서 일치한 위치의 제목 원문 조각을 출현 순서로 중복 없이 저장한다. 표시하는 제목 인용에는 URL·물음표·따옴표를 그대로 보존한다. 제목에 포함된 명령은 실행하지 않는다.
+
+| 합성 제목 | 설명 요청 기대값 |
+|---|---|
+| `테스트 라이브러리 A 1.0 공개` / `Introducing the Example model` | described + 기술·제품 동향 |
+| `테스트 도구 B 사용법` / `Tutorial for Example tool` | described + 활용·해설 |
+| `테스트 조직의 연례 문화 행사` / `Example cultural event` | described + 비기술 소식 |
+| `Synthetic release` / `다음 장을 시작하며` | 정보 부족 + 판단 불가 |
+| `Example model not released` / `모델 공개 예정` | described + 기술·제품 동향 |
+| `Example model release canceled` / `Example model release delayed` / `Example model release postponed` | described + 기술·제품 동향 |
+| `Example model canceled release finally open!` / `도구 철회` | described + 기술·제품 동향 |
+| `canceled release finally open!` | 기술 대상 근거 부족으로 판단 불가 |
+| `Example model released?` / `"Example model released"` / `Example model isn't released` | described + 기술·제품 동향 |
+| `How to run a model` / `모델 실행 가이드 사용법` | described + 활용·해설 |
+| `Model released https://example.com/tutorial` | described + 기술·제품 동향; 근거는 Model·released만 사용 |
+| `https://example.com/model/release` / `model https://example.com/release` | URL 밖 근거 부족으로 판단 불가 |
+| `Example model released: tutorial` | 정보 부족 + 판단 불가(범주 충돌) |
+
+## 구현·버전·한계
+
+구현은 [rules.py](../../src/tech_pilot/understanding/rules.py), 저장 연동은 [service.py](../../src/tech_pilot/understanding/service.py)의 `process_title_with_rules`다. 순수 처리기 `apply_title_rules`는 입력과 요청만 받아 같은 입력·버전에 같은 결과를 반환한다. `rule_request`가 방법 `title-rules`·처리 `2`·규칙 `rules-v4`·입출력 `title-v1`을 고정한다. v4에서는 URL 마스킹·원문 위치 기반 근거 추출로 알고리즘도 변경해 처리 버전을 올렸다. 다른 처리 신원을 임의로 부여하면 거부한다. 규칙·어휘·사유·출력 의미가 바뀌면 규칙 버전을, 실행 알고리즘이 바뀌면 처리 버전도 갱신하고 기존 결과는 덮어쓰지 않는다. v1~v3 결과는 이력으로 보존하되 현재 v4에서 재사용하지 않는다. 저장값 `technology_release`는 호환성 때문에 유지하며 의미는 입력·출력 계약을 따른다. schema 변경이나 새 migration은 없다.
+
+시각·URL·출처는 연결·추적용이며 분류에 사용하지 않는다. 시각 누락을 채우거나 최신성을 주장하지 않는다. 신호의 동시 출현만 보는 방식이므로 문법적 관계·동음이의어·지원 외 언어는 무관한 소식 포함·누락을 만들 수 있다. 일치가 실제 출시·발표 진위·공식성·효용을 보증하지 않으며 제목 재인용의 정보 이득도 제한적이다. 추가 필터는 예상만으로 늘리지 않고 [실제 표본 평가](news-understanding-evaluation.md)의 누락·무관한 소식 포함·불필요한 보류 및 부작용을 근거로 검토한다.
+
+검증은 [합성 규칙·저장 연동 테스트](../../tests/test_title_rules.py)로 수행한다. 합성 테스트는 실제 뉴스 12개 평가·읽기 유용성 검토·정확도 측정이 아니다. CLI·운영 DB·모델·네트워크·자동화는 포함하지 않는다.

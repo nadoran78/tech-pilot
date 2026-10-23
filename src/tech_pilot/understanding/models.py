@@ -22,6 +22,7 @@ class ContentStatus(StrEnum):
 
 
 class Category(StrEnum):
+    # Legacy wire value retained for technology/product developments, not launch verification.
     TECHNOLOGY = "technology_release"
     USAGE = "usage_explanation"
     NONTECHNICAL = "nontechnical"
